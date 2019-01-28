@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "strict": true,
+    "module": "commonjs",
+    "target": "es6",
+    "jsx": "react",
+    "allowJs": true,
+    "skipLibCheck": true
+  },
+  "files": [
+    "@types/images.d.ts",
+    "src/index.tsx"
+  ]
+}

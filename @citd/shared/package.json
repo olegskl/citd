@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "name": "@citd/shared",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "scripts": {},
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}

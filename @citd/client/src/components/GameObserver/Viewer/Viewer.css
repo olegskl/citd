@@ -1,0 +1,30 @@
+.viewer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.viewer > .html-viewer,
+.viewer > .code-viewer {
+  flex: 1;
+}
+
+.code-viewer {
+  border-right: solid 1px #c7a32a;
+}
+
+.player-name {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  background: #c7a32a;
+  padding: 0.5rem 1rem;
+  z-index: 10;
+  color: #181a1a;
+  user-select: none;
+}
+
+.html-viewer {
+  border: none;
+  background: #cfd8cc;
+}

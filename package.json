@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "name": "code-in-the-dark",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "wsrun start --exclude-missing",
+    "build": "wsrun build --exclude-missing"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "wsrun": "^3.6.2"
+  },
+  "devDependencies": {},
+  "workspaces": [
+    "@citd/*"
+  ]
+}

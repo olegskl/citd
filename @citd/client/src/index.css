@@ -1,0 +1,15 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body, main {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-size: 20px;
+  font-family: Helvetica, Arial, sans-serif;
+  color: #cfd8cc;
+  background-color: #191c1b;
+}

@@ -1,0 +1,41 @@
+.gameEditor {
+  width: 100%;
+  height: 100%;
+}
+
+.gameTask {
+  position: fixed;
+  right: 3rem;
+  bottom: 3rem;
+  height: 70vh;
+  background: red;
+  user-select: none;
+  transition: transform 0.25s, opacity 0.25s;
+  transform-origin: 100% 100%;
+  transform: scale(0.5);
+  opacity: 0.5;
+}
+
+.gameTask:hover {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.abandon-game {
+  position: absolute;
+  border: none;
+  bottom: 1rem;
+  right: 3rem;
+  padding: 0.4rem 1rem;
+  background: #71200f;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.25s;
+}
+
+.abandon-game:hover,
+.abandon-game:focus {
+  opacity: 1;
+  outline: none;
+}
