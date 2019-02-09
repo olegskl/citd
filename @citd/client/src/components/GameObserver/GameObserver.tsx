@@ -28,15 +28,22 @@ class GameObserverComponent extends React.PureComponent<ISocketContext, IGameObs
   }
 
   render() {
-    if (this.state.players.length === 0) {
+    const { players } = this.state;
+
+    if (players.length === 0) {
       return (
-        <div className='observer-waiting'>Waiting for players to join...</div>
+        <div className='observer-waiting'>
+          Waiting for players to join
+          <span className="dot">.</span>
+          <span className="dot">.</span>
+          <span className="dot">.</span>
+        </div>
       );
     }
     return (
       <div className='viewer-list'>
-        {this.state.players.map(player => (
-          <Viewer key={player.id} size={1/this.state.players.length} player={player} />
+        {players.map(player => (
+          <Viewer key={player.id} size={1/players.length} player={player} />
         ))}
       </div>
     );

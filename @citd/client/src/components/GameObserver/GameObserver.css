@@ -16,5 +16,40 @@
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 30px;
+  font-size: 40px;
+}
+
+.observer-waiting .dot {
+  animation-name: blink;
+  animation-duration: 1.4s;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+}
+
+.observer-waiting .dot:nth-child(1) {
+  padding-left: 8px;
+  color: #0a354b;
+  animation-delay: .2s;
+}
+
+.observer-waiting .dot:nth-child(2) {
+  color: #772112;
+  animation-delay: .2s;
+}
+
+.observer-waiting .dot:nth-child(3) {
+  color: #c7a429;
+  animation-delay: .4s;
+}
+
+@keyframes blink {
+  0% {
+    opacity: .2;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: .2;
+  }
 }

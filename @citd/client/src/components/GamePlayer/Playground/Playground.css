@@ -23,19 +23,36 @@
 
 .abandon-game {
   position: absolute;
-  border: none;
   bottom: 1rem;
   right: 3rem;
   padding: 0.4rem 1rem;
-  background: #71200f;
-  color: inherit;
-  cursor: pointer;
-  opacity: 0.5;
-  transition: opacity 0.25s;
 }
 
-.abandon-game:hover,
-.abandon-game:focus {
-  opacity: 1;
-  outline: none;
+.abandon-game-confirm {
+  position: absolute;
+  bottom: 1rem;
+  right: 3rem;
+  display: flex;
+  align-items: center;
+}
+
+.abandon-game-confirm * {
+  margin-left: 0.5rem;
+} 
+
+.abandon-game-confirm .confirm-message {
+  color: #569cd6;
+  font-size: 18px;
+} 
+
+.abandon-game-confirm button {
+  padding: 0.4rem 1rem;
+}
+
+.abandon-game-confirm .btn-success {
+  background: #71200f;
+}
+
+.abandon-game-confirm .btn-danger {
+  background: green;
 }
