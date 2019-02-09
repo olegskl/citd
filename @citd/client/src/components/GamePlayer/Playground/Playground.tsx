@@ -60,13 +60,13 @@ class PlaygroundComponent extends React.PureComponent<IPlaygroundProps> {
       <span className="confirm-message">Sure?</span>
       <button 
         onClick={this.props.onLeaveGame}
-        className="button-yes"
+        className="btn-common btn-success"
       >
         Yes, it's hard for me :(
       </button>
       <button 
         onClick={this.denyAbandon}
-        className="button-no"
+        className="btn-common btn-danger"
       >
         No, please!
       </button>
@@ -83,7 +83,7 @@ class PlaygroundComponent extends React.PureComponent<IPlaygroundProps> {
         ) : (
           <button
             onClick={this.confirmAbandon}
-            className='abandon-game'
+            className='btn-common btn-danger abandon-game'
           >
             Abandon game
           </button>

@@ -23,15 +23,9 @@
 
 .abandon-game {
   position: absolute;
-  border: none;
   bottom: 1rem;
   right: 3rem;
   padding: 0.4rem 1rem;
-  background: #71200f;
-  color: inherit;
-  cursor: pointer;
-  opacity: 0.5;
-  transition: opacity 0.25s;
 }
 
 .abandon-game-confirm {
@@ -52,26 +46,13 @@
 } 
 
 .abandon-game-confirm button {
-  border: none;
   padding: 0.4rem 1rem;
-  color: inherit;
-  cursor: pointer;
-  opacity: 0.5;
-  transition: opacity 0.25s;
 }
 
-.abandon-game-confirm .button-yes {
+.abandon-game-confirm .btn-success {
   background: #71200f;
 }
 
-.abandon-game-confirm .button-no {
+.abandon-game-confirm .btn-danger {
   background: green;
-}
-
-.abandon-game:hover,
-.abandon-game:focus,
-.abandon-game-confirm button:hover,
-.abandon-game-confirm button:focus {
-  opacity: 1;
-  outline: none;
 }

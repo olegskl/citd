@@ -6,6 +6,8 @@ import { SocketProvider } from '../../context/socket';
 import { GameObserver } from '../GameObserver';
 import { GamePlayer } from '../GamePlayer';
 
+import "../../styles/buttons.css";
+
 export const App: React.FC = () => (
   <SocketProvider>
     <BrowserRouter>
