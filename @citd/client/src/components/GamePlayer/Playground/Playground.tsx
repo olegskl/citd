@@ -17,6 +17,10 @@ class PlaygroundComponent extends React.PureComponent<IPlaygroundProps> {
   private offDidChangeContent?: IDisposable;
   private model = editor.createModel('', 'html');
   private editorRef = React.createRef<HTMLDivElement>();
+  
+  state = {
+    isConfirm: false
+  };
 
   componentDidMount() {
     editor.create(this.editorRef.current!, {
@@ -39,12 +43,47 @@ class PlaygroundComponent extends React.PureComponent<IPlaygroundProps> {
     }
   }
 
+  confirmAbandon = () => {
+    this.setState({
+      isConfirm: true
+    });
+  };
+
+  denyAbandon = () => {
+    this.setState({
+      isConfirm: false
+    });
+  };
+
   render() {
     return (
       <>
         <div ref={this.editorRef} className='gameEditor' />
         <img src={taskImg} className='gameTask' />
-        <button onClick={this.props.onLeaveGame} className='abandon-game'>Abandon game</button>
+        {this.state.isConfirm ? (
+          <div className="abandon-game-confirm">
+            <span className="confirm-message">Sure?</span>
+            <button 
+              onClick={this.props.onLeaveGame}
+              className="button-yes"
+            >
+              Yes, it's hard for me :(
+            </button>
+            <button 
+              onClick={this.denyAbandon}
+              className="button-no"
+            >
+              No, please!
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={this.confirmAbandon}
+            className='abandon-game'
+          >
+            Abandon game
+          </button>
+        )}
       </>
     );
   }
