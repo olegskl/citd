@@ -55,27 +55,31 @@ class PlaygroundComponent extends React.PureComponent<IPlaygroundProps> {
     });
   };
 
+  renderAbandonConfirm = () => (
+    <div className="abandon-game-confirm">
+      <span className="confirm-message">Sure?</span>
+      <button 
+        onClick={this.props.onLeaveGame}
+        className="button-yes"
+      >
+        Yes, it's hard for me :(
+      </button>
+      <button 
+        onClick={this.denyAbandon}
+        className="button-no"
+      >
+        No, please!
+      </button>
+    </div>
+  );
+
   render() {
     return (
       <>
         <div ref={this.editorRef} className='gameEditor' />
         <img src={taskImg} className='gameTask' />
         {this.state.isConfirm ? (
-          <div className="abandon-game-confirm">
-            <span className="confirm-message">Sure?</span>
-            <button 
-              onClick={this.props.onLeaveGame}
-              className="button-yes"
-            >
-              Yes, it's hard for me :(
-            </button>
-            <button 
-              onClick={this.denyAbandon}
-              className="button-no"
-            >
-              No, please!
-            </button>
-          </div>
+          this.renderAbandonConfirm()
         ) : (
           <button
             onClick={this.confirmAbandon}
