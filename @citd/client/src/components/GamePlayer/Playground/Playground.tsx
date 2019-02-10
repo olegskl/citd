@@ -3,6 +3,7 @@ import { editor, IDisposable } from 'monaco-editor';
 import * as React from 'react';
 
 import { ISocketContext, withSocket } from '../../../context/socket';
+import { Timer } from '../../Timer';
 
 import * as taskImg from '../../../assets/task.png';
 
@@ -76,6 +77,7 @@ class PlaygroundComponent extends React.PureComponent<IPlaygroundProps> {
   render() {
     return (
       <>
+        <Timer active secondsRemaining={15*60} />
         <div ref={this.editorRef} className='gameEditor' />
         <img src={taskImg} className='gameTask' />
         {this.state.isConfirm ? (

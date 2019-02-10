@@ -4,7 +4,7 @@ import * as React from 'react';
 import { ISocketContext, withSocket } from '../../context/socket';
 
 import { Viewer } from './Viewer';
-import { Timer } from './Timer';
+import { Timer } from '../Timer';
 import './GameObserver.css';
 
 interface IGameObserverState {
@@ -43,7 +43,7 @@ class GameObserverComponent extends React.PureComponent<ISocketContext, IGameObs
     }
     return (
       <div className='viewer-list'>
-        <Timer />
+        <Timer active={false} secondsRemaining={15*60} />
         {players.map(player => (
           <Viewer key={player.id} size={1/players.length} player={player} />
         ))}
