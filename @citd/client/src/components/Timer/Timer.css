@@ -1,0 +1,12 @@
+.game-timer {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0a354b;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  padding: 0.3rem;
+  text-align: center;
+}
