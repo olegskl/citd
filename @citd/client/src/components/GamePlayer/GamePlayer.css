@@ -5,6 +5,19 @@
   text-transform: uppercase;
 }
 
+.lobby-header {
+  text-align: center;
+  padding: 20px 0;
+  background: black;
+  position: relative;
+}
+
+@media (max-width: 650px) {
+  .lobby {
+    font-size: 40px;
+  }
+}
+
 .lobby-join,
 .lobby-the,
 .lobby-fun {
@@ -18,7 +31,7 @@
 
 .lobby-nickname {
   position: absolute;
-  top: 20vh;
+  top: 25vh;
   left: 20vw;
   transform: rotate(-5deg);
   border: solid 1rem #c7a429;
@@ -30,7 +43,7 @@
 }
 
 .lobby-join {
-  top: 35vh;
+  top: 40vh;
   left: 20vw;
   width: 40vw;
   height: 20vh;
@@ -41,14 +54,14 @@
 .lobby-the {
   width: 25vw;
   height: 25vh;
-  top: 40vh;
+  top: 45vh;
   left: 50vw;
   background: #772112;
   transform: rotate(-15deg);
 }
 
 .lobby-fun {
-  top: 60vh;
+  top: 65vh;
   right: 20vw;
   width: 40vw;
   height: 20vh;
