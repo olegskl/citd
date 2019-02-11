@@ -89,6 +89,7 @@ class GamePlayerComponent extends React.PureComponent<ISocketContext, IGamePlaye
     return player
       ? <Playground player={player} onLeaveGame={this.leaveGame} />
       : <div className='lobby'>
+          <div className="lobby-header">code in the dark</div>
           <input
             ref={this.inputRef}
             type='text'
