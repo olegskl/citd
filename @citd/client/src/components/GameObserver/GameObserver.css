@@ -1,12 +1,35 @@
-.viewer-list {
+.game-panels {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: stretch;
 }
 
-.viewer-list > .viewer {
+.game-info-panel {
+  display: flex;
   flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 25px;
+}
+
+.game-player-panel {
+  flex: 1;
+  padding: 7px;
+}
+
+.game-player-panel,
+.game-info-panel {
+  border: 10px solid transparent;
+  border-image-source: url('../../assets/border.jpg');
+  border-image-repeat: round;
+  border-image-slice: 65;
+  border-image-width: 15px;
+}
+
+.game-info-image {
+  height: 50%;
 }
 
 .observer-waiting {

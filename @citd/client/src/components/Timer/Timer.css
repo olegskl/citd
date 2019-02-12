@@ -10,3 +10,7 @@
   padding: 0.3rem;
   text-align: center;
 }
+
+.game-panels .game-timer {
+  position: absolute;
+}

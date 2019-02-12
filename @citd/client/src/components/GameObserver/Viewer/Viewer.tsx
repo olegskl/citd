@@ -8,7 +8,6 @@ import './Viewer.css';
 
 interface IViewerProps extends ISocketContext {
   player: IGamePlayer;
-  size: number;
 }
 
 class ViewerComponent extends React.PureComponent<IViewerProps> {
@@ -74,7 +73,7 @@ class ViewerComponent extends React.PureComponent<IViewerProps> {
 
   render() {
     return (
-      <div className='viewer' style={{width: this.props.size * 100 + 'vw'}}>
+      <div className='viewer'>
         <iframe ref={this.htmlViewerRef} className='html-viewer' />
         <div className='player-name'>{this.props.player.nickname}</div>
         <div ref={this.codeViewerRef} className='code-viewer' />

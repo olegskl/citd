@@ -7,6 +7,8 @@ import { Viewer } from './Viewer';
 import { Timer } from '../Timer';
 import './GameObserver.css';
 
+import * as taskImg from '../../assets/task.png';
+
 interface IGameObserverState {
   players: IGamePlayer[];
 }
@@ -42,11 +44,25 @@ class GameObserverComponent extends React.PureComponent<ISocketContext, IGameObs
       );
     }
     return (
-      <div className='viewer-list'>
-        <Timer active={false} secondsRemaining={15*60} />
-        {players.map(player => (
-          <Viewer key={player.id} size={1/players.length} player={player} />
-        ))}
+      <div className='game-panels'>
+        <div className='game-player-panel game-player-one'>
+          {players[0] ? (
+            <Viewer player={players[0]} />
+          ) : (
+            <div className='game-player-placeholder' />
+          )}
+        </div>
+        <div className='game-info-panel'>
+          <Timer active={false} secondsRemaining={15*60} />
+          <img src={taskImg} className='game-info-image' />
+        </div>
+        <div className='game-player-panel game-player-two'>
+          {players[1] ? (
+            <Viewer player={players[1]} />
+          ) : (
+            <div className='game-player-placeholder' />
+          )}
+        </div>
       </div>
     );
   }
