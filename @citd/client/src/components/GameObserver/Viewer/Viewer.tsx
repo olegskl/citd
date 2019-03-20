@@ -1,6 +1,10 @@
 import { IGamePlayer } from '@citd/shared';
-import { editor } from 'monaco-editor';
+import * as CodeMirror from 'codemirror';
 import * as React from 'react';
+
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/material.css';
+import 'codemirror/mode/htmlmixed/htmlmixed.js';
 
 import { ISocketContext, withSocket } from '../../../context/socket';
 
@@ -12,64 +16,66 @@ interface IViewerProps extends ISocketContext {
 }
 
 class ViewerComponent extends React.PureComponent<IViewerProps> {
-  private htmlViewerRef = React.createRef<HTMLIFrameElement>();
+  private codeViewer?: CodeMirror.Editor;
   private codeViewerRef = React.createRef<HTMLDivElement>();
-  private model = editor.createModel('', 'html');
-  private editor: editor.IStandaloneCodeEditor | undefined;
+  private htmlViewerRef = React.createRef<HTMLIFrameElement>();
 
   componentDidMount() {
-    this.editor = editor.create(this.codeViewerRef.current!, {
-      model: this.model,
-      theme: 'vs-dark',
-      minimap: {enabled: false},
-      fontSize: 20,
+    const {id, changes, selections} = this.props.player;
+    this.codeViewer = CodeMirror(this.codeViewerRef.current!, {
       readOnly: true,
-      matchBrackets: false,
-      hideCursorInOverviewRuler: true,
-      lineNumbersMinChars: 3,
-      overviewRulerBorder: false,
-      renderLineHighlight: 'none',
-      scrollbar: {
-        vertical: 'hidden',
-        horizontal: 'hidden'
-      }
+      lineNumbers: true,
+      mode: 'text/html',
+      theme: 'material',
+      tabSize: 2
     });
 
-    // this.props.socket.on('modelCommitted', this.applyValue);
-    this.applyValue(this.props.player.id, this.props.player.model);
-    this.props.socket.on('changesCommitted', this.applyEdits);
+    if (changes.length > 0) {
+      const doc = this.codeViewer.getDoc();
+      changes.forEach(({text, from, to, origin}) => {
+        doc.replaceRange(text.join('\n'), from, to, origin);
+      });
+    }
+    this.applySelections(id, selections);
+
+    this.codeViewer.on('change', this.updateIframe);
+    this.props.socket.on('change', this.applyChange);
+    this.props.socket.on('selections', this.applySelections);
   }
 
   componentWillUnmount() {
-    // this.props.socket.off('modelCommitted', this.applyValue);
-    this.props.socket.off('changesCommitted', this.applyEdits);
+    if (this.codeViewer) {
+      this.codeViewer.off('change', this.updateIframe);
+    }
+    this.props.socket.off('change', this.applyChange);
+    this.props.socket.off('selections', this.applySelections);
   }
 
-  private updateIframe = (value: string) => {
+  private updateIframe = (instance: CodeMirror.Editor) => {
     this.htmlViewerRef.current!.contentWindow!.document.open();
-    this.htmlViewerRef.current!.contentWindow!.document.write(value);
+    this.htmlViewerRef.current!.contentWindow!.document.write(instance.getValue());
     this.htmlViewerRef.current!.contentWindow!.document.close();
   }
 
-  private applyValue = (playerId: string, value: string) => {
-    if (this.props.player.id !== playerId) { return; }
-    if (value !== this.model.getValue()) {
-      this.model.setValue(value);
-      this.updateIframe(value);
-    }
+  private applyChange = (playerId: string, change: CodeMirror.EditorChangeLinkedList) => {
+    if (!this.codeViewer) { return; }
+    const {text, from, to, origin} = change;
+    this.codeViewer.getDoc().replaceRange(text.join('\n'), from, to, origin);
   }
 
-  private applyEdits = (playerId: string, edits: editor.IIdentifiedSingleEditOperation[]) => {
-    if (this.props.player.id !== playerId) { return; }
-    this.model.applyEdits(edits);
-    this.updateIframe(this.model.getValue());
-    const lastEdit = edits[edits.length - 1];
-    if (this.editor) {
-      this.editor.revealPositionInCenterIfOutsideViewport({
-        column: lastEdit.range.endColumn,
-        lineNumber: lastEdit.range.endLineNumber
-      }, 0)
-    }
+  private applySelections = (playerId: string, selections: IGamePlayer['selections']) => {
+    if (!this.codeViewer) { return; }
+    const doc = this.codeViewer.getDoc();
+    doc.getAllMarks().forEach(mark => mark.clear());
+    doc.setSelections(selections);
+    selections.forEach(selection => {
+      const cursorElement = document.createElement('div');
+      cursorElement.className = 'cursor';
+      doc.setBookmark(selection.head, {
+        widget: cursorElement,
+        insertLeft: true
+      });
+    });
   }
 
   render() {

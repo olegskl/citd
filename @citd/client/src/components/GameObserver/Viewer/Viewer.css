@@ -13,6 +13,21 @@
   border-right: solid 1px #c7a32a;
 }
 
+.cursor {
+  display: inline-block;
+  position: absolute;
+  width: 1ch;
+  height: 100%;
+  background-color: #fff;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0% { opacity: 1.0; }
+  50% { opacity: 0.0; }
+  100% { opacity: 1.0; }
+}
+
 .player-name {
   position: absolute;
   top: 50%;

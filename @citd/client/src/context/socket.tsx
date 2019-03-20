@@ -70,7 +70,6 @@ export class SocketProvider extends React.PureComponent<{}, ISocketProviderState
   private onMessage = (event: MessageEvent) => {
     const [eventName, ...args] = JSON.parse(event.data);
     if (this.messageHandlers[eventName]) {
-      console.log('handling message', eventName, args);
       this.messageHandlers[eventName].forEach(handler => handler(...args));
     }
   }

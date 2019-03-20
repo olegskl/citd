@@ -12,7 +12,6 @@
   "dependencies": {
     "@citd/shared": "^1.0.0",
     "bufferutil": "^4.0.1",
-    "monaco-editor-core": "^0.15.5",
     "utf-8-validate": "^5.0.2",
     "ws": "^6.1.3"
   },
