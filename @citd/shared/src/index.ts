@@ -1,3 +1,5 @@
+import { EditorChangeLinkedList, Position } from 'codemirror';
+
 export interface IGame {
   playerCount: number;
   timeElapsed: number;
@@ -8,10 +10,9 @@ export interface IGame {
 export interface IGamePlayer {
   id: string;
   nickname: string;
-  model: string;
-}
-
-export interface IChanges {
-  userId: number;
-  changes: any;
+  changes: EditorChangeLinkedList[];
+  selections: Array<{
+    anchor: Position;
+    head: Position
+  }>;
 }

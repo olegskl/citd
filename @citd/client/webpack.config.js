@@ -1,7 +1,6 @@
 const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MonacoEditorWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -11,8 +10,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './src/index.html',
       title: 'SFEIR Code in the Dark'
-    }),
-    new MonacoEditorWebpackPlugin({languages: ['html']})
+    })
   ],
   output: {
     filename: '[name].bundle.js',

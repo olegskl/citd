@@ -10,19 +10,20 @@
   "license": "MIT",
   "dependencies": {
     "@citd/shared": "^1.0.0",
-    "monaco-editor": "^0.15.6",
+    "@emmetio/codemirror-plugin": "^0.5.4",
+    "codemirror": "^5.44.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-router-dom": "^4.3.1"
   },
   "devDependencies": {
+    "@types/codemirror": "^0.0.72",
     "@types/react": "^16.7.21",
     "@types/react-dom": "^16.0.11",
     "@types/react-router-dom": "^4.3.1",
     "clean-webpack-plugin": "^1.0.1",
     "css-loader": "^2.1.0",
     "html-webpack-plugin": "^3.2.0",
-    "monaco-editor-webpack-plugin": "^1.7.0",
     "style-loader": "^0.23.1",
     "ts-loader": "^5.3.3",
     "typescript": "^3.2.4",

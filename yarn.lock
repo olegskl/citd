@@ -2,9 +2,169 @@
 # yarn lockfile v1
 
 
-"@types/anymatch@*":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@types/anymatch/-/anymatch-1.3.0.tgz#d1d55958d1fccc5527d4aba29fc9c4b942f563ff"
+"@emmetio/abbreviation@^0.6.0":
+  version "0.6.6"
+  resolved "https://registry.yarnpkg.com/@emmetio/abbreviation/-/abbreviation-0.6.6.tgz#03cd13983c22315d2b65fc66a99ad8c3fa44a8ce"
+  dependencies:
+    "@emmetio/node" "^0.1.2"
+    "@emmetio/stream-reader" "^2.2.0"
+    "@emmetio/stream-reader-utils" "^0.1.0"
+
+"@emmetio/abbreviation@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@emmetio/abbreviation/-/abbreviation-0.7.0.tgz#f65b2024699378bfa042607027a236b240ddc009"
+  dependencies:
+    "@emmetio/node" "^0.1.2"
+    "@emmetio/stream-reader" "^2.2.0"
+    "@emmetio/stream-reader-utils" "^0.1.0"
+
+"@emmetio/codemirror-plugin@^0.5.4":
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/@emmetio/codemirror-plugin/-/codemirror-plugin-0.5.4.tgz#859220349526a83c6f02a99c0f43e761983f7878"
+  dependencies:
+    "@emmetio/config" "^0.4.0"
+    "@emmetio/css-snippets-resolver" "^0.3.1"
+    "@emmetio/expand-abbreviation" "^0.7.1"
+    "@emmetio/extract-abbreviation" "^0.2.0"
+    "@emmetio/field-parser" "^0.3.1"
+    "@emmetio/html-matcher" "^0.3.3"
+    "@emmetio/stream-reader" "^2.2.0"
+    "@emmetio/stream-reader-utils" "^0.1.0"
+
+"@emmetio/config@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@emmetio/config/-/config-0.4.0.tgz#f54b52e4f95edb5acc53f6cb473d961555c15fff"
+
+"@emmetio/css-abbreviation@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@emmetio/css-abbreviation/-/css-abbreviation-0.4.0.tgz#5da9b313f3625e3d7539065c5ebeca83891e4dac"
+  dependencies:
+    "@emmetio/node" "^0.1.2"
+    "@emmetio/stream-reader" "^2.2.0"
+    "@emmetio/stream-reader-utils" "^0.1.0"
+
+"@emmetio/css-snippets-resolver@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@emmetio/css-snippets-resolver/-/css-snippets-resolver-0.3.1.tgz#b375df74f660fc61b44e9604224487a31be627fb"
+
+"@emmetio/css-snippets-resolver@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@emmetio/css-snippets-resolver/-/css-snippets-resolver-0.4.0.tgz#6477ead6d25d838e685fa5c84c25aafa576479dc"
+
+"@emmetio/expand-abbreviation@^0.7.1":
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/@emmetio/expand-abbreviation/-/expand-abbreviation-0.7.3.tgz#0cba9b018de4e7969cf28928f376a2ad5dd3e061"
+  dependencies:
+    "@emmetio/abbreviation" "^0.7.0"
+    "@emmetio/css-abbreviation" "^0.4.0"
+    "@emmetio/css-snippets-resolver" "^0.4.0"
+    "@emmetio/html-snippets-resolver" "^0.1.4"
+    "@emmetio/html-transform" "^0.3.9"
+    "@emmetio/lorem" "^1.0.1"
+    "@emmetio/markup-formatters" "^0.4.1"
+    "@emmetio/output-profile" "^0.1.6"
+    "@emmetio/snippets" "^0.2.9"
+    "@emmetio/snippets-registry" "^0.3.1"
+    "@emmetio/stylesheet-formatters" "^0.2.1"
+    "@emmetio/variable-resolver" "^0.2.1"
+
+"@emmetio/extract-abbreviation@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@emmetio/extract-abbreviation/-/extract-abbreviation-0.2.0.tgz#0afc2b40c060549b98ea7b18f426e8317df5829e"
+
+"@emmetio/field-parser@^0.3.0", "@emmetio/field-parser@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@emmetio/field-parser/-/field-parser-0.3.1.tgz#00ff922b2ccc23929d825ad83a9e4fbd094fc0f9"
+  dependencies:
+    "@emmetio/stream-reader" "^2.2.0"
+    "@emmetio/stream-reader-utils" "^0.1.0"
+
+"@emmetio/html-matcher@^0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@emmetio/html-matcher/-/html-matcher-0.3.3.tgz#0bbdadc0882e185950f03737dc6dbf8f7bd90728"
+  dependencies:
+    "@emmetio/stream-reader" "^2.0.0"
+    "@emmetio/stream-reader-utils" "^0.1.0"
+
+"@emmetio/html-snippets-resolver@^0.1.4":
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@emmetio/html-snippets-resolver/-/html-snippets-resolver-0.1.4.tgz#b33ad3fa78fd78d64b94bf88a9fb68b3ad8e8e7e"
+  dependencies:
+    "@emmetio/abbreviation" "^0.6.0"
+
+"@emmetio/html-transform@^0.3.9":
+  version "0.3.10"
+  resolved "https://registry.yarnpkg.com/@emmetio/html-transform/-/html-transform-0.3.10.tgz#f5edbeabe8712e393709298384d7f412fe0aaa7b"
+  dependencies:
+    "@emmetio/implicit-tag" "^1.0.0"
+
+"@emmetio/implicit-tag@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@emmetio/implicit-tag/-/implicit-tag-1.0.0.tgz#f826d4e1fc51da39434c2326b6f6d0e2b2e7b419"
+
+"@emmetio/lorem@^1.0.1":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@emmetio/lorem/-/lorem-1.0.2.tgz#8de6a5718f39172ea7d22532a5b0d3bbd10083dc"
+  dependencies:
+    "@emmetio/implicit-tag" "^1.0.0"
+
+"@emmetio/markup-formatters@^0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@emmetio/markup-formatters/-/markup-formatters-0.4.1.tgz#49ac7e5ba5b75ff0ca4f75fc97b12b63ac7129cb"
+  dependencies:
+    "@emmetio/field-parser" "^0.3.0"
+    "@emmetio/output-renderer" "^0.1.2"
+
+"@emmetio/node@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@emmetio/node/-/node-0.1.2.tgz#4231d538c45481a51835fc2aba3f5d9fc129634c"
+
+"@emmetio/output-profile@^0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@emmetio/output-profile/-/output-profile-0.1.6.tgz#15de23135f4b57225d192cd6efd73d8ffc9dd380"
+
+"@emmetio/output-renderer@^0.1.1", "@emmetio/output-renderer@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@emmetio/output-renderer/-/output-renderer-0.1.2.tgz#0ece11acce9298507868aed21ab5253e1eb082f8"
+  dependencies:
+    "@emmetio/field-parser" "^0.3.0"
+
+"@emmetio/snippets-registry@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@emmetio/snippets-registry/-/snippets-registry-0.3.1.tgz#ec0e8a122fe9683659ce69a22396f4136b940d20"
+
+"@emmetio/snippets@^0.2.9":
+  version "0.2.11"
+  resolved "https://registry.yarnpkg.com/@emmetio/snippets/-/snippets-0.2.11.tgz#0971624761ec5b9fe4546aa242670a150caecdd2"
+
+"@emmetio/stream-reader-utils@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@emmetio/stream-reader-utils/-/stream-reader-utils-0.1.0.tgz#244cb02c77ec2e74f78a9bd318218abc9c500a61"
+
+"@emmetio/stream-reader@^2.0.0", "@emmetio/stream-reader@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@emmetio/stream-reader/-/stream-reader-2.2.0.tgz#46cffea119a0a003312a21c2d9b5628cb5fcd442"
+
+"@emmetio/stylesheet-formatters@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@emmetio/stylesheet-formatters/-/stylesheet-formatters-0.2.1.tgz#d27be6664a6e18b395eca07f6157aa65800b267f"
+  dependencies:
+    "@emmetio/field-parser" "^0.3.0"
+    "@emmetio/output-renderer" "^0.1.1"
+
+"@emmetio/variable-resolver@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@emmetio/variable-resolver/-/variable-resolver-0.2.1.tgz#ce11b51584669a340986690cf0ec269e44c63fba"
+
+"@types/codemirror@^0.0.72":
+  version "0.0.72"
+  resolved "https://registry.yarnpkg.com/@types/codemirror/-/codemirror-0.0.72.tgz#75e95e3b488717605d2591cd80c4d2ed88ff276e"
+  dependencies:
+    "@types/tern" "*"
+
+"@types/estree@*":
+  version "0.0.39"
+  resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.39.tgz#e177e699ee1b8c22d23174caaa7422644389509f"
 
 "@types/events@*":
   version "3.0.0"
@@ -56,25 +216,11 @@
   dependencies:
     "@types/node" "*"
 
-"@types/tapable@*":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.4.tgz#b4ffc7dc97b498c969b360a41eee247f82616370"
-
-"@types/uglify-js@*":
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/@types/uglify-js/-/uglify-js-3.0.4.tgz#96beae23df6f561862a830b4288a49e86baac082"
+"@types/tern@*":
+  version "0.23.0"
+  resolved "https://registry.yarnpkg.com/@types/tern/-/tern-0.23.0.tgz#144326f7a53b013a7dcbf770f6026e075febbd01"
   dependencies:
-    source-map "^0.6.1"
-
-"@types/webpack@^4.4.19":
-  version "4.4.24"
-  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.4.24.tgz#75bc301176066f566ec54151b6101c2b45abb8b2"
-  dependencies:
-    "@types/anymatch" "*"
-    "@types/node" "*"
-    "@types/tapable" "*"
-    "@types/uglify-js" "*"
-    source-map "^0.6.0"
+    "@types/estree" "*"
 
 "@types/ws@^6.0.1":
   version "6.0.1"
@@ -705,6 +851,14 @@ cliui@^4.0.0:
 code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
+
+codemirror@^5.44.0:
+  version "5.44.0"
+  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.44.0.tgz#80dc2a231eeb7aab25ec2405cdca37e693ccf9cc"
+
+codemirror@^5.45.0:
+  version "5.45.0"
+  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.45.0.tgz#db5ebbb3bf44028c684053f3954d011efcec27ad"
 
 collection-visit@^1.0.0:
   version "1.0.0"
@@ -2513,20 +2667,6 @@ mkdirp@0.5.x, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
   dependencies:
     minimist "0.0.8"
-
-monaco-editor-core@^0.15.5:
-  version "0.15.5"
-  resolved "https://registry.yarnpkg.com/monaco-editor-core/-/monaco-editor-core-0.15.5.tgz#145f1953a8e319282d92502252d68ef3486b6875"
-
-monaco-editor-webpack-plugin@^1.7.0:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/monaco-editor-webpack-plugin/-/monaco-editor-webpack-plugin-1.7.0.tgz#920cbeecca25f15d70d568a7e11b0ba4daf1ae83"
-  dependencies:
-    "@types/webpack" "^4.4.19"
-
-monaco-editor@^0.15.6:
-  version "0.15.6"
-  resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.15.6.tgz#d63b3b06f86f803464f003b252627c3eb4a09483"
 
 move-concurrently@^1.0.1:
   version "1.0.1"

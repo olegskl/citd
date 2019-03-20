@@ -6,6 +6,8 @@
   "main": "src/index.ts",
   "scripts": {},
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "codemirror": "^5.45.0"
+  },
   "devDependencies": {}
 }

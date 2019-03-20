@@ -1,10 +1,8 @@
-import { IChanges } from '@citd/shared';
 import * as http from 'http';
-// import { editor } from 'monaco-editor-core/esm/vs/editor/editor.api';
-import { Server as WebSocketServer } from 'ws';
+import { Server as WebSocketServer, OPEN } from 'ws';
 
 import { startGame, pauseGame, unpauseGame } from './game';
-import { addPlayer, getPlayer, getPlayerList, removePlayer, commitModel } from './players';
+import { addPlayer, getPlayer, getPlayerList, removePlayer, applyChange, setSelections } from './players';
 
 const server = http.createServer();
 const ws = new WebSocketServer({server, path: '/sock'});
@@ -46,13 +44,24 @@ ws.on('connection', client => {
       ws.clients.forEach(c => c.send(message));
     }
 
-    else if (eventName === 'commitModel') {
-      const [playerId, model] = args;
-      commitModel(playerId, model);
-    } else if (eventName === 'commitChanges') {
-      const [playerId, changes] = args;
-      const message = JSON.stringify(['changesCommitted', playerId, changes]);
-      ws.clients.forEach(c => c.send(message));
+    else if (eventName === 'selections') {
+      const [playerId, selections] = args;
+      setSelections(playerId, selections);
+      const message = JSON.stringify(['selections', playerId, selections]);
+      ws.clients.forEach(c => {
+        if (c !== client && c.readyState === OPEN) {
+          c.send(message);
+        }
+      });
+    } else if (eventName === 'change') {
+      const [playerId, change] = args;
+      applyChange(playerId, change);
+      const message = JSON.stringify(['change', playerId, change]);
+      ws.clients.forEach(c => {
+        if (c !== client && c.readyState === OPEN) {
+          c.send(message);
+        }
+      });
     }
   });
 });
