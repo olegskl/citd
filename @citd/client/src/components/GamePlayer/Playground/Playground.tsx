@@ -47,8 +47,10 @@ class PlaygroundComponent extends React.PureComponent<IPlaygroundProps> {
 
     const doc = this.codeEditor.getDoc();
     if (changes.length > 0) {
-      changes.forEach(({text, from, to, origin}) => {
-        doc.replaceRange(text.join('\n'), from, to, origin);
+      this.codeEditor.operation(() => {
+        changes.forEach(({text, from, to, origin}) => {
+          doc.replaceRange(text.join('\n'), from, to, origin);
+        });
       });
     }
     doc.setSelections(selections);

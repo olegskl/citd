@@ -19,6 +19,7 @@ class ViewerComponent extends React.PureComponent<IViewerProps> {
   private codeViewer?: CodeMirror.Editor;
   private codeViewerRef = React.createRef<HTMLDivElement>();
   private htmlViewerRef = React.createRef<HTMLIFrameElement>();
+  private isOperationBatched = false;
 
   componentDidMount() {
     const {id, changes, selections} = this.props.player;
@@ -32,8 +33,10 @@ class ViewerComponent extends React.PureComponent<IViewerProps> {
 
     if (changes.length > 0) {
       const doc = this.codeViewer.getDoc();
-      changes.forEach(({text, from, to, origin}) => {
-        doc.replaceRange(text.join('\n'), from, to, origin);
+      this.codeViewer.operation(() => {
+        changes.forEach(({text, from, to, origin}) => {
+          doc.replaceRange(text.join('\n'), from, to, origin);
+        });
       });
     }
     this.applySelections(id, selections);
@@ -59,12 +62,20 @@ class ViewerComponent extends React.PureComponent<IViewerProps> {
 
   private applyChange = (playerId: string, change: CodeMirror.EditorChangeLinkedList) => {
     if (!this.codeViewer) { return; }
+    if (!this.isOperationBatched) {
+      this.codeViewer.startOperation();
+      this.isOperationBatched = true;
+    }
     const {text, from, to, origin} = change;
     this.codeViewer.getDoc().replaceRange(text.join('\n'), from, to, origin);
   }
 
   private applySelections = (playerId: string, selections: IGamePlayer['selections']) => {
     if (!this.codeViewer) { return; }
+    if (!this.isOperationBatched) {
+      this.codeViewer.startOperation();
+      this.isOperationBatched = true;
+    }
     const doc = this.codeViewer.getDoc();
     doc.getAllMarks().forEach(mark => mark.clear());
     doc.setSelections(selections);
@@ -76,6 +87,10 @@ class ViewerComponent extends React.PureComponent<IViewerProps> {
         insertLeft: true
       });
     });
+    if (this.isOperationBatched) {
+      this.codeViewer.endOperation();
+      this.isOperationBatched = false;
+    }
   }
 
   render() {
