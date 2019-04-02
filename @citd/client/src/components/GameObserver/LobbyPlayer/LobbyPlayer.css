@@ -1,0 +1,17 @@
+.lobby-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lobby-player-avatar {
+  width: 30vh;
+  height: 30vh;
+  margin: 0 1rem;
+  overflow: hidden;
+}
+
+.lobby-player-nickname {
+  margin-top: 1.5rem;
+  font-size: 1.5rem;
+}

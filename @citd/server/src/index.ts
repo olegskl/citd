@@ -1,64 +1,140 @@
+import { Game } from '@citd/shared';
 import * as http from 'http';
-import { Server as WebSocketServer, OPEN } from 'ws';
+import * as WebSocket from 'ws';
 
-import { startGame, pauseGame, unpauseGame } from './game';
-import { addPlayer, getPlayer, getPlayerList, removePlayer, applyChange, setSelections } from './players';
+import {
+  getClientsInChannel,
+  addClientToChannel,
+  removeClientFromChannel,
+  removeClientFromAllChannels
+} from './services/channels';
+import {
+  getGame,
+  startGame,
+  pauseGame,
+  resetGame,
+  addPlayerToGame,
+  removePlayerFromGame,
+  setPlayerReadyState,
+  onGameTick,
+  offGameTick
+} from './services/game';
+import { applyOperation, getPlayerTimeline } from './services/timelines';
+import { createUser, findUser } from './services/users';
 
 const server = http.createServer();
-const ws = new WebSocketServer({server, path: '/sock'});
+const ws = new WebSocket.Server({server, path: '/sock'});
 
 server.listen(3000, '127.0.0.1');
 
 ws.on('connection', client => {
 
+  const handleGameTick = (game: Game) => {
+    const message = game.status === 'playing'
+      ? JSON.stringify(['timeRemaining', game.timeRemaining])
+      : JSON.stringify(['game', game]);
+    ws.clients.forEach(c => {
+      if (c.readyState === WebSocket.OPEN) {
+        c.send(message);
+      }
+    });
+  };
+
+  onGameTick(handleGameTick);
+  client.on('closing', () => {
+    offGameTick(handleGameTick);
+    removeClientFromAllChannels(client);
+  });
+  client.on('close', () => {
+    offGameTick(handleGameTick);
+    removeClientFromAllChannels(client);
+  });
+
   client.on('message', message => {
     if (typeof message !== 'string') { return; }
     const [eventName, ...args] = JSON.parse(message);
 
-    if (eventName === 'startGame') {
-      const message = JSON.stringify(['gameStarted', startGame()]);
-      ws.clients.forEach(c => c.send(message));
-    } else if (eventName === 'pauseGame') {
-      const message = JSON.stringify(['gamePaused', pauseGame()]);
-      ws.clients.forEach(c => c.send(message));
-    } else if (eventName === 'unpauseGame') {
-      const message = JSON.stringify(['gameUnpaused', unpauseGame()]);
-      ws.clients.forEach(c => c.send(message));
+    if (eventName === 'joinChannel') {
+      const [channelName] = args;
+      addClientToChannel(client, channelName);
+    } else if (eventName === 'leaveChannel') {
+      const [channelName] = args;
+      removeClientFromChannel(client, channelName);
     }
 
-    else if (eventName === 'getPlayerList') {
-      client.send(JSON.stringify(['playerList', getPlayerList()]));
-    } else if (eventName === 'getPlayer') {
-      client.send(JSON.stringify(['player', getPlayer(args[0])]));
+    else if (eventName === 'getUser') {
+      const [userId] = args;
+      const message = JSON.stringify(['user', findUser(userId)]);
+      client.send(message);
+    } else if (eventName === 'createUser') {
+      const [name] = args;
+      const message = JSON.stringify(['user', createUser(name)]);
+      client.send(message);
     }
 
-    else if (eventName === 'joinGame') {
-      const [playerName] = args;
-      client.send(JSON.stringify(['gameJoined', addPlayer(playerName)]));
-      const message = JSON.stringify(['playerList', getPlayerList()]);
-      ws.clients.forEach(c => c.send(message));
-    } else if (eventName === 'leaveGame') {
-      const [playerId] = args;
-      client.send(JSON.stringify(['gameLeft', removePlayer(playerId)]));
-      const message = JSON.stringify(['playerList', getPlayerList()]);
-      ws.clients.forEach(c => c.send(message));
-    }
-
-    else if (eventName === 'selections') {
-      const [playerId, selections] = args;
-      setSelections(playerId, selections);
-      const message = JSON.stringify(['selections', playerId, selections]);
+    else if (eventName === 'getGame') {
+      const message = JSON.stringify(['game', getGame()]);
+      client.send(message);
+    } else if (eventName === 'startGame') {
+      const message = JSON.stringify(['game', startGame()]);
       ws.clients.forEach(c => {
-        if (c !== client && c.readyState === OPEN) {
+        if (c.readyState === WebSocket.OPEN) {
           c.send(message);
         }
       });
-    } else if (eventName === 'change') {
-      const [playerId, change] = args;
-      applyChange(playerId, change);
-      const message = JSON.stringify(['change', playerId, change]);
+    } else if (eventName === 'pauseGame') {
+      const message = JSON.stringify(['game', pauseGame()]);
       ws.clients.forEach(c => {
-        if (c !== client && c.readyState === OPEN) {
+        if (c.readyState === WebSocket.OPEN) {
+          c.send(message);
+        }
+      });
+    } else if (eventName === 'resetGame') {
+      const message = JSON.stringify(['game', resetGame()]);
+      ws.clients.forEach(c => {
+        if (c.readyState === WebSocket.OPEN) {
+          c.send(message);
+        }
+      });
+    }
+
+    else if (eventName === 'joinGame') {
+      const [playerId] = args;
+      const message = JSON.stringify(['game', addPlayerToGame(playerId)]);
+      ws.clients.forEach(c => {
+        if (c.readyState === WebSocket.OPEN) {
+          c.send(message);
+        }
+      });
+    } else if (eventName === 'leaveGame' || eventName === 'kickPlayerFromGame') {
+      const [playerId] = args;
+      const message = JSON.stringify(['game', removePlayerFromGame(playerId)]);
+      ws.clients.forEach(c => {
+        if (c.readyState === WebSocket.OPEN) {
+          c.send(message);
+        }
+      });
+    }
+    else if (eventName === 'readyToPlay') {
+      const [playerId, readyState] = args;
+      const message = JSON.stringify(['game', setPlayerReadyState(playerId, readyState)]);
+      ws.clients.forEach(c => {
+        if (c.readyState === WebSocket.OPEN) {
+          c.send(message);
+        }
+      });
+    }
+
+    else if (eventName === 'getPlayerTimeline') {
+      const [playerId] = args;
+      client.send(JSON.stringify(['playerTimeline', playerId, getPlayerTimeline(playerId)]));
+    }
+    else if (eventName === 'operation') {
+      const [playerId, operation] = args;
+      applyOperation(playerId, operation);
+      const message = JSON.stringify(['operation', playerId, operation]);
+      getClientsInChannel('observers').forEach(c => {
+        if (c !== client && c.readyState === WebSocket.OPEN) {
           c.send(message);
         }
       });

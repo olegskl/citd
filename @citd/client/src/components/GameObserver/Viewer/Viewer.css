@@ -6,11 +6,12 @@
 
 .viewer > .html-viewer,
 .viewer > .code-viewer {
-  flex: 1;
+  flex: 0 0 calc(50vh - 1rem);
+  margin: 0.5rem 0;
 }
 
 .code-viewer {
-  border-right: solid 1px #c7a32a;
+  position: relative;
 }
 
 .cursor {
@@ -20,12 +21,6 @@
   height: 100%;
   background-color: #fff;
   animation: blink 1s step-end infinite;
-}
-
-@keyframes blink {
-  0% { opacity: 1.0; }
-  50% { opacity: 0.0; }
-  100% { opacity: 1.0; }
 }
 
 .player-name {
@@ -42,4 +37,10 @@
 .html-viewer {
   border: none;
   background: #cfd8cc;
+}
+
+.CodeMirror {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }

@@ -1,0 +1,18 @@
+.preview {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview > .html-viewer {
+  flex: 0 0 calc(50vh - 1rem);
+  margin: 0.5rem 0;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.preview > .scores {
+  flex: 0 0 calc(50vh - 1rem);
+  margin: 0.5rem 0;
+}

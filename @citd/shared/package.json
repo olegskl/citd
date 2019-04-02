@@ -3,11 +3,17 @@
   "name": "@citd/shared",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.ts",
-  "scripts": {},
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "start": "tsc -w",
+    "build": "tsc"
+  },
   "license": "MIT",
   "dependencies": {
     "codemirror": "^5.45.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "typescript": "^3.4.1"
+  }
 }

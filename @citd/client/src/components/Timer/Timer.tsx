@@ -1,78 +1,36 @@
 import * as React from 'react';
 
+import { GameContext, withGame } from '../../context/game';
+import { ISocketContext, withSocket } from '../../context/socket';
+
 import './Timer.css';
 
-interface ITimerProps {
-  active: boolean;
-  secondsRemaining: number;
-}
+type TimerProps = GameContext & ISocketContext;
 
-interface ITimerState {
+interface TimerState {
   minutes: number;
   seconds: number;
 }
 
-export class Timer extends React.PureComponent<ITimerProps, ITimerState> {
-  private intervalId: number | undefined;
-  private INTERVAL = 1000;
-
-  state = {
+class TimerComponent extends React.PureComponent<TimerProps, TimerState> {
+  state: TimerState = {
     seconds: 0,
     minutes: 0
   };
 
   componentDidMount() {
-    const { active, secondsRemaining } = this.props;
-
-    this.setTime(secondsRemaining);
-
-    if (active) {
-      this.intervalId = window.setInterval(this.tick, this.INTERVAL);
-    }
-  }
-
-  componentDidUpdate(prevProps: ITimerProps) {
-    const { secondsRemaining, active } = this.props;
-
-    if (prevProps.secondsRemaining !== secondsRemaining) {
-      this.setTime(secondsRemaining);
-    }
-
-    if (!prevProps.active && active) {
-      this.intervalId = window.setInterval(this.tick, this.INTERVAL);
-    } else if (prevProps.active && !active) {
-      window.clearInterval(this.intervalId);
-    }
+    this.setTime(this.props.game.timeRemaining);
+    this.props.socket.on('timeRemaining', this.setTime);
   }
 
   componentWillUnmount() {
-    window.clearInterval(this.intervalId);
+    this.props.socket.off('timeRemaining', this.setTime);
   }
 
   private setTime = (secondsRemaining: number) => {
     const minutes = Math.floor(secondsRemaining / 60);
     const seconds = secondsRemaining - minutes * 60;
-
-    this.setState({
-      minutes,
-      seconds
-    });
-  };
-
-  private tick = () => {
-    const { minutes, seconds } = this.state;
-
-    const updatedSeconds = seconds === 0 ? 59 : seconds - 1;
-    const updatedMinutes = seconds === 0 ? minutes - 1 : minutes;
-
-    if (updatedMinutes < 0) {
-      window.clearInterval(this.intervalId);
-    } else {
-      this.setState({
-        minutes: updatedMinutes,
-        seconds: updatedSeconds
-      });
-    }
+    this.setState({minutes, seconds});
   };
 
   render() {
@@ -88,3 +46,5 @@ export class Timer extends React.PureComponent<ITimerProps, ITimerState> {
     );
   }
 }
+
+export const Timer = withSocket(withGame(TimerComponent));
