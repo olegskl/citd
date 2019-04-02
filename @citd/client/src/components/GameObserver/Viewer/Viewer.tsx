@@ -1,4 +1,4 @@
-import { IGamePlayer } from '@citd/shared';
+import { isChange, isSelections, Change, Operation, Player, Selection } from '@citd/shared';
 import * as CodeMirror from 'codemirror';
 import * as React from 'react';
 
@@ -11,8 +11,7 @@ import { ISocketContext, withSocket } from '../../../context/socket';
 import './Viewer.css';
 
 interface IViewerProps extends ISocketContext {
-  player: IGamePlayer;
-  size: number;
+  player: Player;
 }
 
 class ViewerComponent extends React.PureComponent<IViewerProps> {
@@ -22,7 +21,6 @@ class ViewerComponent extends React.PureComponent<IViewerProps> {
   private isOperationBatched = false;
 
   componentDidMount() {
-    const {id, changes, selections} = this.props.player;
     this.codeViewer = CodeMirror(this.codeViewerRef.current!, {
       readOnly: true,
       lineNumbers: true,
@@ -31,51 +29,50 @@ class ViewerComponent extends React.PureComponent<IViewerProps> {
       tabSize: 2
     });
 
-    if (changes.length > 0) {
-      const doc = this.codeViewer.getDoc();
-      this.codeViewer.operation(() => {
-        changes.forEach(({text, from, to, origin}) => {
-          doc.replaceRange(text.join('\n'), from, to, origin);
-        });
-      });
-    }
-    this.applySelections(id, selections);
+    const onPlayerTimeline = (playerId: string, operations: Operation[]) => {
+      if (playerId !== this.props.player.id) { return; }
+      this.props.socket.off('playerTimeline', onPlayerTimeline);
 
-    this.codeViewer.on('change', this.updateIframe);
-    this.props.socket.on('change', this.applyChange);
-    this.props.socket.on('selections', this.applySelections);
+      if (!this.codeViewer) { return; }
+
+      this.codeViewer.on('change', this.updateIframe);
+      if (operations.length === 0) { return; }
+      this.codeViewer.operation(() => {
+        // Apply only Changes first:
+        operations.forEach(operation => {
+          if (isChange(operation)) {
+            this.applyChange(operation);
+          }
+        });
+        // Apply selection if it's the last one:
+        const lastOperation = operations[operations.length - 1];
+        if (isSelections(lastOperation)) {
+          this.applySelections(lastOperation);
+        }
+      });
+
+      this.props.socket.on('operation', this.applyBatchedOperation);
+    }
+
+    this.props.socket.on('playerTimeline', onPlayerTimeline);
+    this.props.socket.emit('getPlayerTimeline', this.props.player.id);
   }
 
   componentWillUnmount() {
     if (this.codeViewer) {
       this.codeViewer.off('change', this.updateIframe);
     }
-    this.props.socket.off('change', this.applyChange);
-    this.props.socket.off('selections', this.applySelections);
+    this.props.socket.off('operation', this.applyBatchedOperation);
   }
 
-  private updateIframe = (instance: CodeMirror.Editor) => {
-    this.htmlViewerRef.current!.contentWindow!.document.open();
-    this.htmlViewerRef.current!.contentWindow!.document.write(instance.getValue());
-    this.htmlViewerRef.current!.contentWindow!.document.close();
-  }
-
-  private applyChange = (playerId: string, change: CodeMirror.EditorChangeLinkedList) => {
+  private applyChange = (change: Change) => {
     if (!this.codeViewer) { return; }
-    if (!this.isOperationBatched) {
-      this.codeViewer.startOperation();
-      this.isOperationBatched = true;
-    }
     const {text, from, to, origin} = change;
     this.codeViewer.getDoc().replaceRange(text.join('\n'), from, to, origin);
   }
 
-  private applySelections = (playerId: string, selections: IGamePlayer['selections']) => {
+  private applySelections = (selections: Selection[]) => {
     if (!this.codeViewer) { return; }
-    if (!this.isOperationBatched) {
-      this.codeViewer.startOperation();
-      this.isOperationBatched = true;
-    }
     const doc = this.codeViewer.getDoc();
     doc.getAllMarks().forEach(mark => mark.clear());
     doc.setSelections(selections);
@@ -87,18 +84,41 @@ class ViewerComponent extends React.PureComponent<IViewerProps> {
         insertLeft: true
       });
     });
-    if (this.isOperationBatched) {
-      this.codeViewer.endOperation();
-      this.isOperationBatched = false;
+  }
+
+  private applyBatchedOperation = (playerId: string, operation: Operation) => {
+    if (playerId !== this.props.player.id) { return; }
+    if (!this.codeViewer) { return; }
+
+    if (!this.isOperationBatched) {
+      this.codeViewer.startOperation();
+      this.isOperationBatched = true;
     }
+
+    if (isChange(operation)) {
+      this.applyChange(operation);
+    } else {
+      this.applySelections(operation);
+      if (this.isOperationBatched) {
+        this.codeViewer.endOperation();
+        this.isOperationBatched = false;
+      }
+    }
+
+  }
+
+  private updateIframe = (instance: CodeMirror.Editor) => {
+    this.htmlViewerRef.current!.contentWindow!.document.open();
+    this.htmlViewerRef.current!.contentWindow!.document.write(instance.getValue());
+    this.htmlViewerRef.current!.contentWindow!.document.close();
   }
 
   render() {
     return (
-      <div className='viewer' style={{width: this.props.size * 100 + 'vw'}}>
-        <iframe ref={this.htmlViewerRef} className='html-viewer' />
-        <div className='player-name'>{this.props.player.nickname}</div>
-        <div ref={this.codeViewerRef} className='code-viewer' />
+      <div className='viewer'>
+        <iframe ref={this.htmlViewerRef} className='html-viewer box-glitchy-white' />
+        <div className='player-name'>{this.props.player.name}</div>
+        <div ref={this.codeViewerRef} className='code-viewer box-glitchy-white' />
       </div>
     );
   }

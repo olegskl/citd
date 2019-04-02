@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "wsrun start --exclude-missing",
-    "build": "wsrun build --exclude-missing"
+    "start": "wsrun start",
+    "build": "wsrun build"
   },
   "license": "MIT",
   "dependencies": {

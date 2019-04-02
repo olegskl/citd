@@ -1,110 +1,41 @@
-import { IGamePlayer } from '@citd/shared';
 import * as React from 'react';
 
+import { GameContext, withGame } from '../../context/game';
 import { ISocketContext, withSocket } from '../../context/socket';
+import { UserContext, withUser } from '../../context/user';
 
+import { GameOver } from './GameOver';
+import { PlayerLobby } from './PlayerLobby';
 import { Playground } from './Playground';
-import './GamePlayer.css';
 
-interface IGamePlayerState {
-  player?: IGamePlayer;
-  loading: boolean;
-  nickname: string;
-}
+type GamePlayerProps = ISocketContext & UserContext & GameContext;
 
-class GamePlayerComponent extends React.PureComponent<ISocketContext, IGamePlayerState> {
-  private inputRef = React.createRef<HTMLInputElement>();
-  state: IGamePlayerState = {
-    loading: true,
-    nickname: ''
-  };
+class GamePlayerComponent extends React.PureComponent<GamePlayerProps> {
 
   componentDidMount() {
-    // Does player exist in sessionstorage?:
-    const playerId = window.sessionStorage.getItem('citd-player-id');
-    if (playerId) {
-      // Does player exist on server?:
-      this.props.socket.on('player', this.onPlayer);
-      this.props.socket.emit('getPlayer', playerId);
-    } else {
-      this.setState({loading: false});
-    }
-
-    this.props.socket.on('gameJoined', this.onGameJoined);
-    this.props.socket.on('gameLeft', this.onGameLeft);
+    this.props.socket.emit('joinChannel', 'players');
+    this.props.socket.emit('joinGame', this.props.user.id);
   }
 
   componentWillUnmount() {
-    this.props.socket.off('player', this.onPlayer);
-    this.props.socket.off('gameJoined', this.onGameJoined);
-    this.props.socket.off('gameLeft', this.onGameLeft);
-  }
-
-  private onPlayer = (player: IGamePlayer) => {
-    if (player) {
-      this.setState({player, loading: false});
-      window.sessionStorage.setItem('citd-player-id', player.id);
-    } else {
-      this.setState({loading: false});
-    }
-  }
-
-  private onGameJoined = (player: IGamePlayer) => {
-    this.setState({player});
-    window.sessionStorage.setItem('citd-player-id', player.id);
-  }
-
-  private onGameLeft = () => {
-    this.setState({player: undefined});
-    window.sessionStorage.removeItem('citd-player-id');
-  }
-
-  private joinGame = () => {
-    if (!this.state.nickname) {
-      this.inputRef.current!.focus();
-      return;
-    }
-    this.props.socket.emit('joinGame', this.state.nickname);
-  }
-
-  private leaveGame = () => {
-    if (!this.state.player) { return; }
-    this.props.socket.emit('leaveGame', this.state.player.id);
-  }
-
-  private onNicknameChange = (e: React.ChangeEvent<any>) => {
-    this.setState({nickname: e.currentTarget.value});
-  }
-
-  private onNicknameKeyPress = (e: React.KeyboardEvent) => {
-    const charCode = e.which || e.keyCode;
-    if (charCode === 13) {
-      this.joinGame();
-    }
+    this.props.socket.emit('leaveChannel', 'players');
   }
 
   render() {
-    const {player, loading, nickname} = this.state;
-    if (loading) { return null; }
-    return player
-      ? <Playground player={player} onLeaveGame={this.leaveGame} />
-      : <div className='lobby'>
-          <div className="lobby-header">code in the dark</div>
-          <input
-            ref={this.inputRef}
-            type='text'
-            value={nickname}
-            onChange={this.onNicknameChange}
-            onKeyPress={this.onNicknameKeyPress}
-            autoFocus
-            className='lobby-nickname'
-            placeholder='Enter your name, and...'
-          />
-          <a onClick={this.joinGame} className='lobby-join'>join</a>
-          <a onClick={this.joinGame} className='lobby-the'>the</a>
-          <a onClick={this.joinGame} className='lobby-fun'>game</a>
-        </div>;
+    const {game, user} = this.props;
+
+    // Waiting state:
+    const isPlayerInGame = game.players.some(player => player.id === user.id);
+    if (game.status === 'waiting' || !isPlayerInGame) {
+      return <PlayerLobby />;
+    }
+    // Ended state:
+    if (game.status === 'ended') {
+      return <GameOver />;
+    }
+    // Playing (and paused as overlay) state:
+    return <Playground />;
   }
 };
 
-export const GamePlayer = withSocket(GamePlayerComponent);
+export const GamePlayer = withSocket(withUser(withGame(GamePlayerComponent)));

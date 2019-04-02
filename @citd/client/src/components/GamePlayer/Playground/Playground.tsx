@@ -1,4 +1,4 @@
-import { IGamePlayer } from '@citd/shared';
+import { isChange, isSelections, Operation } from '@citd/shared';
 import * as CodeMirror from 'codemirror';
 import applyEmmetPlugin from '@emmetio/codemirror-plugin';
 import * as React from 'react';
@@ -9,19 +9,19 @@ import 'codemirror/theme/material.css';
 import 'codemirror/keymap/sublime.js';
 import 'codemirror/mode/htmlmixed/htmlmixed.js';
 
+import { GameContext, withGame } from '../../../context/game';
 import { ISocketContext, withSocket } from '../../../context/socket';
+import { UserContext, withUser } from '../../../context/user';
 import { Timer } from '../../Timer';
+import { PlayerPaused } from '../PlayerPaused';
 
-import * as taskImg from '../../../assets/task.png';
+import { task, color } from '../../../task';
 
 import './Playground.css';
 
-interface IPlaygroundProps extends ISocketContext {
-  player: IGamePlayer;
-  onLeaveGame: () => void;
-}
+type PlaygroundProps = ISocketContext & UserContext & GameContext;
 
-class PlaygroundComponent extends React.PureComponent<IPlaygroundProps> {
+class PlaygroundComponent extends React.PureComponent<PlaygroundProps> {
   private codeEditor?: CodeMirror.Editor;
   private codeEditorRef = React.createRef<HTMLDivElement>();
 
@@ -30,8 +30,6 @@ class PlaygroundComponent extends React.PureComponent<IPlaygroundProps> {
   };
 
   componentDidMount() {
-    const {changes, selections} = this.props.player;
-
     this.codeEditor = CodeMirror(this.codeEditorRef.current!, {
       lineNumbers: true,
       mode: 'text/html',
@@ -45,19 +43,35 @@ class PlaygroundComponent extends React.PureComponent<IPlaygroundProps> {
       }
     });
 
-    const doc = this.codeEditor.getDoc();
-    if (changes.length > 0) {
-      this.codeEditor.operation(() => {
-        changes.forEach(({text, from, to, origin}) => {
-          doc.replaceRange(text.join('\n'), from, to, origin);
-        });
-      });
-    }
-    doc.setSelections(selections);
-    this.codeEditor.focus();
+    const onPlayerTimeline = (playerId: string, operations: Operation[]) => {
+      if (playerId !== this.props.user.id) { return; }
+      this.props.socket.off('playerTimeline', onPlayerTimeline);
 
-    this.codeEditor.on('change', this.emitChange);
-    this.codeEditor.on('cursorActivity', this.emitSelections);
+      if (operations.length === 0 || !this.codeEditor) { return; }
+
+      const doc = this.codeEditor.getDoc();
+      this.codeEditor.operation(() => {
+        // Apply only Changes first:
+        operations.forEach(operation => {
+          if (isChange(operation)) {
+            const {text, from, to, origin} = operation;
+            doc.replaceRange(text.join('\n'), from, to, origin);
+          }
+        });
+        // Apply selection if it's the last one:
+        const lastOperation = operations[operations.length - 1];
+        if (isSelections(lastOperation)) {
+          doc.setSelections(lastOperation);
+        }
+      });
+      this.codeEditor.focus();
+
+      this.codeEditor.on('change', this.emitChange);
+      this.codeEditor.on('cursorActivity', this.emitSelections);
+    };
+
+    this.props.socket.on('playerTimeline', onPlayerTimeline);
+    this.props.socket.emit('getPlayerTimeline', this.props.user.id);
   }
 
   componentWillUnmount() {
@@ -66,64 +80,46 @@ class PlaygroundComponent extends React.PureComponent<IPlaygroundProps> {
     this.codeEditor.off('cursorActivity', this.emitSelections);
   }
 
+  componentDidUpdate(prevProps: PlaygroundProps) {
+    if (!this.codeEditor) { return; }
+    if (this.props.game.status === 'playing') {
+      if (prevProps.game.status !== 'playing') {
+        this.codeEditor.setOption('readOnly', false);
+      }
+    } else if (prevProps.game.status === 'playing') {
+      this.codeEditor.setOption('readOnly', true);
+    }
+  }
+
   private emitChange = (instance: CodeMirror.Editor, change: CodeMirror.EditorChangeLinkedList) => {
-    this.props.socket.emit('change', this.props.player.id, change);
+    this.props.socket.emit('operation', this.props.user.id, change);
   }
 
   private emitSelections = (instance: CodeMirror.Editor) => {
     const selections = instance.getDoc().listSelections();
-    this.props.socket.emit('selections', this.props.player.id, selections);
+    this.props.socket.emit('operation', this.props.user.id, selections);
   }
 
-  confirmAbandon = () => {
-    this.setState({
-      isConfirm: true
-    });
-  };
-
-  denyAbandon = () => {
-    this.setState({
-      isConfirm: false
-    });
-  };
-
-  renderAbandonConfirm = () => (
-    <div className="abandon-game-confirm">
-      <span className="confirm-message">Sure?</span>
-      <button
-        onClick={this.props.onLeaveGame}
-        className="btn-common btn-success"
-      >
-        Yes, it's hard for me :(
-      </button>
-      <button
-        onClick={this.denyAbandon}
-        className="btn-common btn-danger"
-      >
-        No, please!
-      </button>
-    </div>
-  );
-
   render() {
+    const {game} = this.props;
     return (
-      <>
-        <Timer active secondsRemaining={15*60} />
-        <div ref={this.codeEditorRef} className='code-editor' />
-        <img src={taskImg} className='gameTask' />
-        {this.state.isConfirm ? (
-          this.renderAbandonConfirm()
-        ) : (
-          <button
-            onClick={this.confirmAbandon}
-            className='btn-common btn-danger abandon-game'
-          >
-            Abandon game
-          </button>
-        )}
-      </>
+      <div className='playground-wrapper'>
+        <h1 className='text-glitchy-large'>Code in the Dark</h1>
+        <div className='playground'>
+          <div ref={this.codeEditorRef} className='code-editor box-glitchy-white' />
+          <div className='sidebar'>
+            <div
+              className='box-glitchy-white sidebar-preview'
+              style={{backgroundColor: color, backgroundImage: `url(${task})`}}
+            />
+            <Timer />
+            {/* <img src={task} className='gameTask' /> */}
+          </div>
+          {game.status === 'paused' && <PlayerPaused />}
+        </div>
+      </div>
     );
   }
 };
 
-export const Playground = withSocket(PlaygroundComponent);
+export const Playground = withSocket(withUser(withGame(PlaygroundComponent)));

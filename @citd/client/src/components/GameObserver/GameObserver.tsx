@@ -1,55 +1,43 @@
-import { IGamePlayer } from '@citd/shared';
 import * as React from 'react';
 
+import { GameContext, withGame } from '../../context/game';
 import { ISocketContext, withSocket } from '../../context/socket';
 
+import { ObserverControls } from './ObserverControls';
+import { ObserverLobby } from './ObserverLobby';
+import { Preview } from './Preview';
 import { Viewer } from './Viewer';
-import { Timer } from '../Timer';
+
 import './GameObserver.css';
 
-interface IGameObserverState {
-  players: IGamePlayer[];
-}
+type GameObserverProps = ISocketContext & GameContext;
 
-class GameObserverComponent extends React.PureComponent<ISocketContext, IGameObserverState> {
-  state: IGameObserverState = {players: []};
+class GameObserverComponent extends React.PureComponent<GameObserverProps> {
 
   componentDidMount() {
-    this.props.socket.emit('startGame');
-    this.props.socket.emit('getPlayerList', this.updatePlayerList);
-    this.props.socket.on('playerList', this.updatePlayerList);
+    this.props.socket.emit('joinChannel', 'observers');
   }
 
   componentWillUnmount() {
-    this.props.socket.off('playerList', this.updatePlayerList);
-  }
-
-  private updatePlayerList = (players: IGamePlayer[]) => {
-    this.setState({players});
+    this.props.socket.emit('leaveChannel', 'observers');
   }
 
   render() {
-    const { players } = this.state;
+    const {game} = this.props;
 
-    if (players.length === 0) {
+    if (game.status === 'playing' || game.status === 'paused' || game.status === 'ended') {
       return (
-        <div className='observer-waiting'>
-          Waiting for players to join
-          <span className="dot">.</span>
-          <span className="dot">.</span>
-          <span className="dot">.</span>
+        <div className='viewer-list'>
+          <Viewer player={game.players[0]} />
+          <Preview />
+          <Viewer player={game.players[1]} />
+          <ObserverControls game={game} />
         </div>
       );
     }
-    return (
-      <div className='viewer-list'>
-        <Timer active={false} secondsRemaining={15*60} />
-        {players.map(player => (
-          <Viewer key={player.id} size={1/players.length} player={player} />
-        ))}
-      </div>
-    );
+
+    return <ObserverLobby game={game} />;
   }
 }
 
-export const GameObserver = withSocket(GameObserverComponent);
+export const GameObserver = withSocket(withGame(GameObserverComponent));

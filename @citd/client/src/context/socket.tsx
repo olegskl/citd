@@ -93,7 +93,7 @@ export class SocketProvider extends React.PureComponent<{}, ISocketProviderState
   };
 
   render() {
-    if (!this.socket && !this.state.connected) {
+    if (!this.socket || !this.state.connected) {
       return 'Connecting to the server...';
     }
     return (

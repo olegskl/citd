@@ -1,58 +1,39 @@
-.gameEditor {
-  width: 100%;
-  height: 100%;
-}
-
-.gameTask {
-  position: fixed;
-  right: 3rem;
-  bottom: 3rem;
-  height: 70vh;
-  background: red;
-  user-select: none;
-  transition: transform 0.25s, opacity 0.25s;
-  transform-origin: 100% 100%;
-  transform: scale(0.5);
-  opacity: 0.5;
-}
-
-.gameTask:hover {
-  transform: scale(1);
-  opacity: 1;
-}
-
-.abandon-game {
-  position: absolute;
-  bottom: 1rem;
-  right: 3rem;
-  padding: 0.4rem 1rem;
-}
-
-.abandon-game-confirm {
-  position: absolute;
-  bottom: 1rem;
-  right: 3rem;
+.playground-wrapper {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
 }
 
-.abandon-game-confirm * {
-  margin-left: 0.5rem;
-} 
-
-.abandon-game-confirm .confirm-message {
-  color: #569cd6;
-  font-size: 18px;
-} 
-
-.abandon-game-confirm button {
-  padding: 0.4rem 1rem;
+.playground {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
 }
 
-.abandon-game-confirm .btn-success {
-  background: #71200f;
+.code-editor {
+  position: relative;
+  flex: 1;
+  margin: 0.5rem;
 }
 
-.abandon-game-confirm .btn-danger {
-  background: green;
+.code-editor > .CodeMirror {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.sidebar {
+  position: relative;
+  flex: 0 0 calc(100vw / 3);
+}
+
+.sidebar-preview {
+  margin: 0.5rem;
+  width: calc(100% - 1rem);
+  height: calc(50vh - 1rem);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
 }

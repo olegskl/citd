@@ -1,0 +1,11 @@
+.observer-lobby {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.observer-lobby-player-list {
+  margin-top: 4rem;
+  display: flex;
+  align-items: center;
+}
