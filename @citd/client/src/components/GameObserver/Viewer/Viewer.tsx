@@ -142,10 +142,20 @@ class ViewerComponent extends React.PureComponent<ViewerProps, ViewerState> {
       <div className='viewer'>
         <div className='html-viewer box-glitchy-white'>
           {typeof iframeADoc === 'string' && (
-            <iframe onLoad={this.onLoadA} srcDoc={iframeADoc} className={iframeAPos} />
+            <iframe
+              onLoad={this.onLoadA}
+              srcDoc={iframeADoc}
+              className={iframeAPos}
+              sandbox='allow-scripts'
+            />
           )}
           {typeof iframeBDoc === 'string' && (
-            <iframe onLoad={this.onLoadB} srcDoc={iframeBDoc} className={iframeBPos} />
+            <iframe
+              onLoad={this.onLoadB}
+              srcDoc={iframeBDoc}
+              className={iframeBPos}
+              sandbox='allow-scripts'
+            />
           )}
         </div>
         <div className='player-name'>{this.props.player.name}</div>
