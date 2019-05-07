@@ -35,8 +35,24 @@
 }
 
 .html-viewer {
-  border: none;
+  position: relative;
   background: #cfd8cc;
+}
+
+.html-viewer > iframe {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: inherit;
+}
+
+.html-viewer > iframe.above {
+  z-index: 2;
+}
+
+.html-viewer > iframe.below {
+  z-index: 1;
 }
 
 .CodeMirror {

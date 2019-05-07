@@ -10,15 +10,23 @@ import { ISocketContext, withSocket } from '../../../context/socket';
 
 import './Viewer.css';
 
-interface IViewerProps extends ISocketContext {
+interface ViewerProps extends ISocketContext {
   player: Player;
 }
 
-class ViewerComponent extends React.PureComponent<IViewerProps> {
+type ViewerState =
+  | {iframeAPos: 'above', iframeBPos: 'below', iframeADoc?: string, iframeBDoc?: string}
+  | {iframeAPos: 'below', iframeBPos: 'above', iframeADoc?: string, iframeBDoc?: string};
+
+class ViewerComponent extends React.PureComponent<ViewerProps, ViewerState> {
   private codeViewer?: CodeMirror.Editor;
   private codeViewerRef = React.createRef<HTMLDivElement>();
-  private htmlViewerRef = React.createRef<HTMLIFrameElement>();
   private isOperationBatched = false;
+
+  state: ViewerState = {
+    iframeAPos: 'above',
+    iframeBPos: 'below'
+  }
 
   componentDidMount() {
     this.codeViewer = CodeMirror(this.codeViewerRef.current!, {
@@ -35,7 +43,7 @@ class ViewerComponent extends React.PureComponent<IViewerProps> {
 
       if (!this.codeViewer) { return; }
 
-      this.codeViewer.on('change', this.updateIframe);
+      this.codeViewer.on('changes', this.updateIframe);
       if (operations.length === 0) { return; }
       this.codeViewer.operation(() => {
         // Apply only Changes first:
@@ -107,16 +115,39 @@ class ViewerComponent extends React.PureComponent<IViewerProps> {
 
   }
 
+  private onLoadA = () => {
+    this.setState({iframeAPos: 'above', iframeBPos: 'below'});
+  }
+
+  private onLoadB = () => {
+    this.setState({iframeAPos: 'below', iframeBPos: 'above'});
+  }
+
   private updateIframe = (instance: CodeMirror.Editor) => {
-    this.htmlViewerRef.current!.contentWindow!.document.open();
-    this.htmlViewerRef.current!.contentWindow!.document.write(instance.getValue());
-    this.htmlViewerRef.current!.contentWindow!.document.close();
+    this.setState(({iframeAPos, iframeBPos, iframeADoc, iframeBDoc}) => {
+      const doc = instance.getValue();
+      return iframeAPos === 'above' && iframeBPos === 'below'
+        ? iframeBDoc === doc
+          ? {iframeBPos: 'above', iframeAPos: 'below', iframeADoc, iframeBDoc}
+          : {iframeAPos, iframeBPos, iframeADoc, iframeBDoc: doc}
+        : iframeADoc === doc
+          ? {iframeAPos: 'above', iframeBPos: 'below', iframeADoc, iframeBDoc}
+          : {iframeAPos, iframeBPos, iframeADoc: doc, iframeBDoc};
+    });
   }
 
   render() {
+    const {iframeAPos, iframeBPos, iframeADoc, iframeBDoc} = this.state;
     return (
       <div className='viewer'>
-        <iframe ref={this.htmlViewerRef} className='html-viewer box-glitchy-white' />
+        <div className='html-viewer box-glitchy-white'>
+          {typeof iframeADoc === 'string' && (
+            <iframe onLoad={this.onLoadA} srcDoc={iframeADoc} className={iframeAPos} />
+          )}
+          {typeof iframeBDoc === 'string' && (
+            <iframe onLoad={this.onLoadB} srcDoc={iframeBDoc} className={iframeBPos} />
+          )}
+        </div>
         <div className='player-name'>{this.props.player.name}</div>
         <div ref={this.codeViewerRef} className='code-viewer box-glitchy-white' />
       </div>
