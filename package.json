@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "wsrun": "^3.6.2"
+    "wsrun": "^5.0.2"
   },
   "devDependencies": {},
   "workspaces": [
