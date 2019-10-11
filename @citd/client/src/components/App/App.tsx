@@ -5,8 +5,8 @@ import { GameProvider } from '../../context/game';
 import { SocketProvider } from '../../context/socket';
 import { UserProvider } from '../../context/user';
 
-import { GameObserver } from '../GameObserver';
-import { GamePlayer } from '../GamePlayer';
+import { ObserverPage } from '../ObserverPage';
+import { PlayerPage } from '../PlayerPage';
 
 export const App: React.FC = () => (
   <SocketProvider>
@@ -14,8 +14,8 @@ export const App: React.FC = () => (
       <GameProvider>
         <BrowserRouter>
           <Switch>
-            <Route path='/observer' component={GameObserver} />
-            <Route path='/' component={GamePlayer} />
+            <Route path='/observer' component={ObserverPage} />
+            <Route path='/' component={PlayerPage} />
           </Switch>
         </BrowserRouter>
       </GameProvider>

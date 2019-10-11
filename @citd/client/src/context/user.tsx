@@ -2,7 +2,7 @@ import { User } from '@citd/shared';
 import * as React from 'react';
 
 import { ISocketContext, withSocket } from './socket';
-import { Credentials } from '../components/Credentials';
+import { LoginPage } from '../components/LoginPage';
 
 const UserContext = React.createContext<User | undefined>(undefined);
 
@@ -51,9 +51,9 @@ class UserProviderComponent extends React.Component<ISocketContext, UserProvider
       return 'Fetching user...';
     }
 
-    // Credentials state:
+    // Login state:
     if (!user) {
-      return <Credentials />;
+      return <LoginPage />;
     }
 
     // User is available:

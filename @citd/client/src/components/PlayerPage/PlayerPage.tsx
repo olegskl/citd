@@ -8,9 +8,9 @@ import { GameOver } from './GameOver';
 import { PlayerLobby } from './PlayerLobby';
 import { Playground } from './Playground';
 
-type GamePlayerProps = ISocketContext & UserContext & GameContext;
+type PlayerPageProps = ISocketContext & UserContext & GameContext;
 
-class GamePlayerComponent extends React.PureComponent<GamePlayerProps> {
+class PlayerPageComponent extends React.PureComponent<PlayerPageProps> {
 
   componentDidMount() {
     this.props.socket.emit('joinChannel', 'players');
@@ -38,4 +38,4 @@ class GamePlayerComponent extends React.PureComponent<GamePlayerProps> {
   }
 };
 
-export const GamePlayer = withSocket(withUser(withGame(GamePlayerComponent)));
+export const PlayerPage = withSocket(withUser(withGame(PlayerPageComponent)));

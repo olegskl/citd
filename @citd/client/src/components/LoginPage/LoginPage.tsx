@@ -2,14 +2,14 @@ import * as React from 'react';
 
 import { ISocketContext, withSocket } from '../../context/socket';
 
-import './Credentials.css';
+import './LoginPage.css';
 
-interface CredentialsState {
+interface LoginPageState {
   nickname: string;
 }
 
-class CredentialsComponent extends React.PureComponent<ISocketContext, CredentialsState> {
-  state: CredentialsState = {
+class LoginPageComponent extends React.PureComponent<ISocketContext, LoginPageState> {
+  state: LoginPageState = {
     nickname: ''
   };
 
@@ -43,7 +43,7 @@ class CredentialsComponent extends React.PureComponent<ISocketContext, Credentia
   render() {
     const {nickname} = this.state;
     return (
-      <div className='credentials'>
+      <div className='login-page'>
         <h1 className='text-glitchy-large'>Code in the Dark</h1>
         <div className='text-glitchy-medium'>What's your name?</div>
         <div className='nickname'>
@@ -61,4 +61,4 @@ class CredentialsComponent extends React.PureComponent<ISocketContext, Credentia
   }
 };
 
-export const Credentials = withSocket(CredentialsComponent);
+export const LoginPage = withSocket(LoginPageComponent);

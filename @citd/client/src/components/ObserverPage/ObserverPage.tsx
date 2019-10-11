@@ -8,11 +8,11 @@ import { ObserverLobby } from './ObserverLobby';
 import { Preview } from './Preview';
 import { Viewer } from './Viewer';
 
-import './GameObserver.css';
+import './ObserverPage.css';
 
-type GameObserverProps = ISocketContext & GameContext;
+type ObserverPageProps = ISocketContext & GameContext;
 
-class GameObserverComponent extends React.PureComponent<GameObserverProps> {
+class ObserverPageComponent extends React.PureComponent<ObserverPageProps> {
 
   componentDidMount() {
     this.props.socket.emit('joinChannel', 'observers');
@@ -40,4 +40,4 @@ class GameObserverComponent extends React.PureComponent<GameObserverProps> {
   }
 }
 
-export const GameObserver = withSocket(withGame(GameObserverComponent));
+export const ObserverPage = withSocket(withGame(ObserverPageComponent));
