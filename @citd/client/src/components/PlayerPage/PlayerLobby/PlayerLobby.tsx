@@ -1,4 +1,3 @@
-import { Game, Player } from '@citd/shared';
 import * as React from 'react';
 
 import { GameContext, withGame } from '../../../context/game';
