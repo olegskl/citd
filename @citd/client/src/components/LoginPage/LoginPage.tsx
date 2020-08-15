@@ -53,4 +53,4 @@ const LoginPageComponent: React.FC<ISocketContext> = ({ socket }) => {
   );
 };
 
-export const LoginPage = withSocket(LoginPageComponent);
+export const LoginPage = withSocket(React.memo(LoginPageComponent));
