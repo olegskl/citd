@@ -13,9 +13,9 @@
     "@emmetio/codemirror-plugin": "^0.5.4",
     "avataaars": "^1.2.1",
     "codemirror": "^5.44.0",
-    "react": "^16.7.0",
-    "react-dom": "^16.7.0",
-    "react-router-dom": "^5.1.2"
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0"
   },
   "devDependencies": {
     "@types/codemirror": "^0.0.78",
