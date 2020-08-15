@@ -15,8 +15,8 @@ interface ViewerProps extends ISocketContext {
 }
 
 type ViewerState =
-  | {iframeAPos: 'above', iframeBPos: 'below', iframeADoc?: string, iframeBDoc?: string}
-  | {iframeAPos: 'below', iframeBPos: 'above', iframeADoc?: string, iframeBDoc?: string};
+  | { iframeAPos: 'above'; iframeBPos: 'below'; iframeADoc?: string; iframeBDoc?: string }
+  | { iframeAPos: 'below'; iframeBPos: 'above'; iframeADoc?: string; iframeBDoc?: string };
 
 class ViewerComponent extends React.PureComponent<ViewerProps, ViewerState> {
   private codeViewer?: CodeMirror.Editor;
@@ -25,8 +25,8 @@ class ViewerComponent extends React.PureComponent<ViewerProps, ViewerState> {
 
   state: ViewerState = {
     iframeAPos: 'above',
-    iframeBPos: 'below'
-  }
+    iframeBPos: 'below',
+  };
 
   componentDidMount() {
     this.codeViewer = CodeMirror(this.codeViewerRef.current!, {
@@ -34,20 +34,26 @@ class ViewerComponent extends React.PureComponent<ViewerProps, ViewerState> {
       lineNumbers: true,
       mode: 'text/html',
       theme: 'material',
-      tabSize: 2
+      tabSize: 2,
     });
 
     const onPlayerTimeline = (playerId: string, operations: Operation[]) => {
-      if (playerId !== this.props.player.id) { return; }
+      if (playerId !== this.props.player.id) {
+        return;
+      }
       this.props.socket.off('playerTimeline', onPlayerTimeline);
 
-      if (!this.codeViewer) { return; }
+      if (!this.codeViewer) {
+        return;
+      }
 
       this.codeViewer.on('changes', this.updateIframe);
-      if (operations.length === 0) { return; }
+      if (operations.length === 0) {
+        return;
+      }
       this.codeViewer.operation(() => {
         // Apply only Changes first:
-        operations.forEach(operation => {
+        operations.forEach((operation) => {
           if (isChange(operation)) {
             this.applyChange(operation);
           }
@@ -60,7 +66,7 @@ class ViewerComponent extends React.PureComponent<ViewerProps, ViewerState> {
       });
 
       this.props.socket.on('operation', this.applyBatchedOperation);
-    }
+    };
 
     this.props.socket.on('playerTimeline', onPlayerTimeline);
     this.props.socket.emit('getPlayerTimeline', this.props.player.id);
@@ -74,29 +80,37 @@ class ViewerComponent extends React.PureComponent<ViewerProps, ViewerState> {
   }
 
   private applyChange = (change: Change) => {
-    if (!this.codeViewer) { return; }
-    const {text, from, to, origin} = change;
+    if (!this.codeViewer) {
+      return;
+    }
+    const { text, from, to, origin } = change;
     this.codeViewer.getDoc().replaceRange(text.join('\n'), from, to, origin);
-  }
+  };
 
   private applySelections = (selections: Selection[]) => {
-    if (!this.codeViewer) { return; }
+    if (!this.codeViewer) {
+      return;
+    }
     const doc = this.codeViewer.getDoc();
-    doc.getAllMarks().forEach(mark => mark.clear());
+    doc.getAllMarks().forEach((mark) => mark.clear());
     doc.setSelections(selections);
-    selections.forEach(selection => {
+    selections.forEach((selection) => {
       const cursorElement = document.createElement('div');
       cursorElement.className = 'cursor';
       doc.setBookmark(selection.head, {
         widget: cursorElement,
-        insertLeft: true
+        insertLeft: true,
       });
     });
-  }
+  };
 
   private applyBatchedOperation = (playerId: string, operation: Operation) => {
-    if (playerId !== this.props.player.id) { return; }
-    if (!this.codeViewer) { return; }
+    if (playerId !== this.props.player.id) {
+      return;
+    }
+    if (!this.codeViewer) {
+      return;
+    }
 
     if (!this.isOperationBatched) {
       this.codeViewer.startOperation();
@@ -112,41 +126,40 @@ class ViewerComponent extends React.PureComponent<ViewerProps, ViewerState> {
         this.isOperationBatched = false;
       }
     }
-
-  }
+  };
 
   private onLoadA = () => {
-    this.setState({iframeAPos: 'above', iframeBPos: 'below'});
-  }
+    this.setState({ iframeAPos: 'above', iframeBPos: 'below' });
+  };
 
   private onLoadB = () => {
-    this.setState({iframeAPos: 'below', iframeBPos: 'above'});
-  }
+    this.setState({ iframeAPos: 'below', iframeBPos: 'above' });
+  };
 
   private updateIframe = (instance: CodeMirror.Editor) => {
-    this.setState(({iframeAPos, iframeBPos, iframeADoc, iframeBDoc}) => {
+    this.setState(({ iframeAPos, iframeBPos, iframeADoc, iframeBDoc }) => {
       const doc = instance.getValue();
       return iframeAPos === 'above' && iframeBPos === 'below'
         ? iframeBDoc === doc
-          ? {iframeBPos: 'above', iframeAPos: 'below', iframeADoc, iframeBDoc}
-          : {iframeAPos, iframeBPos, iframeADoc, iframeBDoc: doc}
+          ? { iframeBPos: 'above', iframeAPos: 'below', iframeADoc, iframeBDoc }
+          : { iframeAPos, iframeBPos, iframeADoc, iframeBDoc: doc }
         : iframeADoc === doc
-          ? {iframeAPos: 'above', iframeBPos: 'below', iframeADoc, iframeBDoc}
-          : {iframeAPos, iframeBPos, iframeADoc: doc, iframeBDoc};
+        ? { iframeAPos: 'above', iframeBPos: 'below', iframeADoc, iframeBDoc }
+        : { iframeAPos, iframeBPos, iframeADoc: doc, iframeBDoc };
     });
-  }
+  };
 
   render() {
-    const {iframeAPos, iframeBPos, iframeADoc, iframeBDoc} = this.state;
+    const { iframeAPos, iframeBPos, iframeADoc, iframeBDoc } = this.state;
     return (
-      <div className='viewer'>
-        <div className='html-viewer box-glitchy-white'>
+      <div className="viewer">
+        <div className="html-viewer box-glitchy-white">
           {typeof iframeADoc === 'string' && (
             <iframe
               onLoad={this.onLoadA}
               srcDoc={iframeADoc}
               className={iframeAPos}
-              sandbox='allow-scripts'
+              sandbox="allow-scripts"
             />
           )}
           {typeof iframeBDoc === 'string' && (
@@ -154,12 +167,12 @@ class ViewerComponent extends React.PureComponent<ViewerProps, ViewerState> {
               onLoad={this.onLoadB}
               srcDoc={iframeBDoc}
               className={iframeBPos}
-              sandbox='allow-scripts'
+              sandbox="allow-scripts"
             />
           )}
         </div>
-        <div className='player-name'>{this.props.player.name}</div>
-        <div ref={this.codeViewerRef} className='code-viewer box-glitchy-white' />
+        <div className="player-name">{this.props.player.name}</div>
+        <div ref={this.codeViewerRef} className="code-viewer box-glitchy-white" />
       </div>
     );
   }

@@ -13,7 +13,6 @@ import './ObserverPage.css';
 type ObserverPageProps = ISocketContext & GameContext;
 
 class ObserverPageComponent extends React.PureComponent<ObserverPageProps> {
-
   componentDidMount() {
     this.props.socket.emit('joinChannel', 'observers');
   }
@@ -23,11 +22,11 @@ class ObserverPageComponent extends React.PureComponent<ObserverPageProps> {
   }
 
   render() {
-    const {game} = this.props;
+    const { game } = this.props;
 
     if (game.status === 'playing' || game.status === 'paused' || game.status === 'ended') {
       return (
-        <div className='viewer-list'>
+        <div className="viewer-list">
           <Viewer player={game.players[0]} />
           <Preview />
           <Viewer player={game.players[1]} />

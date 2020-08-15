@@ -17,7 +17,7 @@ interface UserProviderState {
 
 class UserProviderComponent extends React.Component<ISocketContext, UserProviderState> {
   state: UserProviderState = {
-    loading: true
+    loading: true,
   };
 
   componentDidMount() {
@@ -26,7 +26,7 @@ class UserProviderComponent extends React.Component<ISocketContext, UserProvider
     if (userId) {
       this.props.socket.emit('getUser', userId);
     } else {
-      this.setState({loading: false});
+      this.setState({ loading: false });
     }
   }
 
@@ -36,15 +36,15 @@ class UserProviderComponent extends React.Component<ISocketContext, UserProvider
 
   private onUser = (user: User) => {
     if (user) {
-      this.setState({loading: false, user});
+      this.setState({ loading: false, user });
       window.sessionStorage.setItem('citd-user-id', user.id);
     } else {
-      this.setState({loading: false});
+      this.setState({ loading: false });
     }
-  }
+  };
 
   render() {
-    const {loading, user} = this.state;
+    const { loading, user } = this.state;
 
     // Loading state:
     if (loading) {
@@ -57,25 +57,20 @@ class UserProviderComponent extends React.Component<ISocketContext, UserProvider
     }
 
     // User is available:
-    return (
-      <UserContext.Provider value={user}>
-        {this.props.children}
-      </UserContext.Provider>
-    );
+    return <UserContext.Provider value={user}>{this.props.children}</UserContext.Provider>;
   }
 }
 
 export const UserProvider = withSocket(UserProviderComponent);
 
 export function withUser<T extends UserContext>(
-  Component: React.ComponentType<T>
+  Component: React.ComponentType<T>,
 ): React.FC<Pick<T, Exclude<keyof T, 'user'>>> {
   return function WrappedComponent(props) {
     return (
       <UserContext.Consumer>
-        {user => <Component {...props as any} user={user} />}
+        {(user) => <Component {...(props as any)} user={user} />}
       </UserContext.Consumer>
     );
   };
-};
-
+}

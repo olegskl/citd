@@ -1,4 +1,6 @@
 declare module '@emmetio/codemirror-plugin' {
-  var plugin = (codemirror: any) => {};
+  const plugin = (codemirror: any) => {
+    /* */
+  };
   export default plugin;
 }
