@@ -1,93 +1,78 @@
-import { Game } from '@citd/shared';
 import * as React from 'react';
 
+import { GameContext } from '../../../context/game';
 import { ISocketContext, withSocket } from '../../../context/socket';
 
 import './ObserverControls.css';
 
-interface ObserverLobbyProps extends ISocketContext {
-  game: Game;
-}
+type ObserverLobbyProps = ISocketContext & GameContext;
 
-interface ObserverLobbyState {
-  areControlsDisplayed: boolean;
-}
+const ObserverControlsComponent: React.FC<ObserverLobbyProps> = ({ socket, game }) => {
+  const [areControlsDisplayed, setControlsDisplayed] = React.useState<boolean>(false);
 
-class ObserverControlsComponent extends React.PureComponent<
-  ObserverLobbyProps,
-  ObserverLobbyState
-> {
-  state: ObserverLobbyState = {
-    areControlsDisplayed: false,
+  React.useEffect(() => {
+    const toggleControlsOnEsc = (event: KeyboardEvent) => {
+      if (event.which === 27) {
+        setControlsDisplayed(!areControlsDisplayed);
+      }
+    };
+
+    window.addEventListener('keydown', toggleControlsOnEsc);
+
+    return () => {
+      window.removeEventListener('keydown', toggleControlsOnEsc);
+    };
+  }, [areControlsDisplayed]);
+
+  const pauseGame = () => {
+    socket.emit('pauseGame');
   };
 
-  componentDidMount() {
-    window.addEventListener('keydown', this.toggleControlsOnEsc);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.toggleControlsOnEsc);
-  }
-
-  private toggleControlsOnEsc = (event: KeyboardEvent) => {
-    if (event.which === 27) {
-      this.setState(({ areControlsDisplayed }) => ({
-        areControlsDisplayed: !areControlsDisplayed,
-      }));
-    }
+  const startGame = () => {
+    socket.emit('startGame');
   };
 
-  private pauseGame = () => {
-    this.props.socket.emit('pauseGame');
+  const resetGame = () => {
+    socket.emit('resetGame');
   };
 
-  private startGame = () => {
-    this.props.socket.emit('startGame');
-  };
-
-  private resetGame = () => {
-    this.props.socket.emit('resetGame');
-  };
-
-  private renderTitle = () => {
-    const { status } = this.props.game;
-    if (status === 'playing') {
+  const renderTitle = () => {
+    if (game.status === 'playing') {
       return <div className="text-glitchy-medium">Time is running out!</div>;
     }
-    if (status === 'paused') {
+    if (game.status === 'paused') {
       return <div className="text-glitchy-medium">Game is paused...</div>;
     }
-    if (status === 'ended') {
+    if (game.status === 'ended') {
       return <div className="text-glitchy-medium">Game has ended</div>;
     }
+
     return null;
   };
 
-  render() {
-    const { game } = this.props;
-    if (!this.state.areControlsDisplayed) {
-      return null;
-    }
-    return (
-      <div className="observer-controls">
-        <h1 className="text-glitchy-large">Code in the Dark</h1>
-        {this.renderTitle()}
-        {game.status === 'playing' && (
-          <button className="button-glitchy-yellow" onClick={this.pauseGame}>
-            Pause the game
-          </button>
-        )}
-        {game.status === 'paused' && (
-          <button className="button-glitchy-yellow" onClick={this.startGame}>
-            Unpause the game
-          </button>
-        )}
-        <button className="button-glitchy-yellow" onClick={this.resetGame}>
-          Reset the game
-        </button>
-      </div>
-    );
+  if (!areControlsDisplayed) {
+    return null;
   }
-}
 
-export const ObserverControls = withSocket(ObserverControlsComponent);
+  return (
+    <div className="observer-controls">
+      <h1 className="text-glitchy-large">Code in the Dark</h1>
+      {renderTitle()}
+      {game.status === 'playing' && (
+        <button className="button-glitchy-yellow" onClick={pauseGame}>
+          Pause the game
+        </button>
+      )}
+      {game.status === 'paused' && (
+        <button className="button-glitchy-yellow" onClick={startGame}>
+          Unpause the game
+        </button>
+      )}
+      <button className="button-glitchy-yellow" onClick={resetGame}>
+        Reset the game
+      </button>
+    </div>
+  );
+};
+
+export const ObserverControls = withSocket(React.memo(ObserverControlsComponent));
