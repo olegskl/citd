@@ -4,50 +4,53 @@ import Avatar from 'avataaars';
 
 import './LobbyPlayer.css';
 
-interface LobbyPlayerProps {
+type LobbyPlayerProps = {
   player: Player | undefined;
   namePlaceholder: string;
   onPlayerKick: (playerId: string) => void;
-}
+};
 
-export class LobbyPlayer extends React.PureComponent<LobbyPlayerProps> {
-  private kickPlayer = () => {
-    if (this.props.player) {
-      this.props.onPlayerKick(this.props.player.id);
+const LobbyPlayerComponent: React.FC<LobbyPlayerProps> = ({
+  player,
+  namePlaceholder,
+  onPlayerKick,
+}) => {
+  const kickPlayer = () => {
+    if (player) {
+      onPlayerKick(player.id);
     }
   };
 
-  render() {
-    if (!this.props.player) {
-      return (
-        <div className="lobby-player">
-          <div className="lobby-player-avatar box-glitchy-red" />
-          <div className="lobby-player-nickname text-glitchy-medium">
-            {this.props.namePlaceholder}
-          </div>
-        </div>
-      );
-    }
+  if (!player) {
     return (
       <div className="lobby-player">
-        <div className="lobby-player-avatar box-glitchy-red" onClick={this.kickPlayer}>
-          <Avatar
-            style={{ width: '30vh', height: '30vh' }}
-            avatarStyle="Transparent"
-            topType="LongHairMiaWallace"
-            accessoriesType="Prescription02"
-            hairColor="BrownDark"
-            facialHairType="Blank"
-            clotheType="Hoodie"
-            clotheColor="PastelBlue"
-            eyeType="Happy"
-            eyebrowType="Default"
-            mouthType="Smile"
-            skinColor="Light"
-          />
-        </div>
-        <div className="lobby-player-nickname text-glitchy-medium">{this.props.player.name}</div>
+        <div className="lobby-player-avatar box-glitchy-red" />
+        <div className="lobby-player-nickname text-glitchy-medium">{namePlaceholder}</div>
       </div>
     );
   }
-}
+
+  return (
+    <div className="lobby-player">
+      <div className="lobby-player-avatar box-glitchy-red" onClick={kickPlayer}>
+        <Avatar
+          style={{ width: '30vh', height: '30vh' }}
+          avatarStyle="Transparent"
+          topType="LongHairMiaWallace"
+          accessoriesType="Prescription02"
+          hairColor="BrownDark"
+          facialHairType="Blank"
+          clotheType="Hoodie"
+          clotheColor="PastelBlue"
+          eyeType="Happy"
+          eyebrowType="Default"
+          mouthType="Smile"
+          skinColor="Light"
+        />
+      </div>
+      <div className="lobby-player-nickname text-glitchy-medium">{player.name}</div>
+    </div>
+  );
+};
+
+export const LobbyPlayer = React.memo(LobbyPlayerComponent);
