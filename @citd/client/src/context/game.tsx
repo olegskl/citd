@@ -16,7 +16,7 @@ interface GameProviderState {
 
 class GameProviderComponent extends React.Component<ISocketContext, GameProviderState> {
   state: GameProviderState = {
-    loading: true
+    loading: true,
   };
 
   componentDidMount() {
@@ -29,11 +29,11 @@ class GameProviderComponent extends React.Component<ISocketContext, GameProvider
   }
 
   private onGame = (game: Game) => {
-    this.setState({loading: false, game});
-  }
+    this.setState({ loading: false, game });
+  };
 
   render() {
-    const {loading, game} = this.state;
+    const { loading, game } = this.state;
 
     // Loading state:
     if (loading) {
@@ -41,25 +41,20 @@ class GameProviderComponent extends React.Component<ISocketContext, GameProvider
     }
 
     // User is available:
-    return (
-      <GameContext.Provider value={game}>
-        {this.props.children}
-      </GameContext.Provider>
-    );
+    return <GameContext.Provider value={game}>{this.props.children}</GameContext.Provider>;
   }
 }
 
 export const GameProvider = withSocket(GameProviderComponent);
 
 export function withGame<T extends GameContext>(
-  Component: React.ComponentType<T>
+  Component: React.ComponentType<T>,
 ): React.FC<Pick<T, Exclude<keyof T, 'game'>>> {
   return function WrappedComponent(props) {
     return (
       <GameContext.Consumer>
-        {game => <Component {...props as T} game={game} />}
+        {(game) => <Component {...(props as T)} game={game} />}
       </GameContext.Consumer>
     );
   };
-};
-
+}

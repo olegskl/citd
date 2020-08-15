@@ -15,7 +15,7 @@ interface TimerState {
 class TimerComponent extends React.PureComponent<TimerProps, TimerState> {
   state: TimerState = {
     seconds: 0,
-    minutes: 0
+    minutes: 0,
   };
 
   componentDidMount() {
@@ -30,7 +30,7 @@ class TimerComponent extends React.PureComponent<TimerProps, TimerState> {
   private setTime = (secondsRemaining: number) => {
     const minutes = Math.floor(secondsRemaining / 60);
     const seconds = secondsRemaining - minutes * 60;
-    this.setState({minutes, seconds});
+    this.setState({ minutes, seconds });
   };
 
   render() {
@@ -40,7 +40,7 @@ class TimerComponent extends React.PureComponent<TimerProps, TimerState> {
     const secondsText = seconds < 10 ? `0${seconds}` : seconds;
 
     return (
-      <div className='game-timer'>
+      <div className="game-timer">
         {minutesText}:{secondsText}
       </div>
     );

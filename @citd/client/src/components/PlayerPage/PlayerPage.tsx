@@ -11,7 +11,6 @@ import { Playground } from './Playground';
 type PlayerPageProps = ISocketContext & UserContext & GameContext;
 
 class PlayerPageComponent extends React.PureComponent<PlayerPageProps> {
-
   componentDidMount() {
     this.props.socket.emit('joinChannel', 'players');
     this.props.socket.emit('joinGame', this.props.user.id);
@@ -22,10 +21,10 @@ class PlayerPageComponent extends React.PureComponent<PlayerPageProps> {
   }
 
   render() {
-    const {game, user} = this.props;
+    const { game, user } = this.props;
 
     // Waiting state:
-    const isPlayerInGame = game.players.some(player => player.id === user.id);
+    const isPlayerInGame = game.players.some((player) => player.id === user.id);
     if (game.status === 'waiting' || !isPlayerInGame) {
       return <PlayerLobby />;
     }
@@ -36,6 +35,6 @@ class PlayerPageComponent extends React.PureComponent<PlayerPageProps> {
     // Playing (and paused as overlay) state:
     return <Playground />;
   }
-};
+}
 
 export const PlayerPage = withSocket(withUser(withGame(PlayerPageComponent)));

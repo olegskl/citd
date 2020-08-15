@@ -14,8 +14,8 @@ export const App: React.FC = () => (
       <GameProvider>
         <BrowserRouter>
           <Switch>
-            <Route path='/observer' component={ObserverPage} />
-            <Route path='/' component={PlayerPage} />
+            <Route path="/observer" component={ObserverPage} />
+            <Route path="/" component={PlayerPage} />
           </Switch>
         </BrowserRouter>
       </GameProvider>
