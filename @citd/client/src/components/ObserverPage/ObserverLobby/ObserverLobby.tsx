@@ -1,30 +1,29 @@
-import { Game } from '@citd/shared';
 import * as React from 'react';
 
+import { GameContext } from '../../../context/game';
 import { ISocketContext, withSocket } from '../../../context/socket';
 import { LobbyPlayer } from '../LobbyPlayer';
 
 import './ObserverLobby.css';
 
-interface ObserverLobbyProps extends ISocketContext {
-  game: Game;
-}
+type ObserverLobbyProps = ISocketContext & GameContext;
 
-class ObserverLobbyComponent extends React.PureComponent<ObserverLobbyProps> {
-  private onPlayerKick = (playerId: string) => {
-    this.props.socket.emit('kickPlayerFromGame', playerId);
+const ObserverLobbyComponent: React.FC<ObserverLobbyProps> = ({ socket, game }) => {
+  const { players, status } = game;
+
+  const onPlayerKick = (playerId: string) => {
+    socket.emit('kickPlayerFromGame', playerId);
   };
 
-  private startGame = () => {
-    this.props.socket.emit('startGame');
+  const startGame = () => {
+    socket.emit('startGame');
   };
 
-  private resetGame = () => {
-    this.props.socket.emit('resetGame');
+  const resetGame = () => {
+    socket.emit('resetGame');
   };
 
-  private renderTitle = () => {
-    const { players, status } = this.props.game;
+  const renderTitle = () => {
     if (status === 'waiting') {
       const allPlayersReady = players.length === 2 && players.every((player) => player.readyToPlay);
       return allPlayersReady ? (
@@ -39,61 +38,51 @@ class ObserverLobbyComponent extends React.PureComponent<ObserverLobbyProps> {
     if (status === 'ended') {
       return <div className="text-glitchy-medium">Game has ended</div>;
     }
+
     return null;
   };
 
-  private renderCallToAction = () => {
-    const { players, status } = this.props.game;
+  const renderCallToAction = () => {
     if (status === 'waiting') {
       const allPlayersReady = players.length === 2 && players.every((player) => player.readyToPlay);
       const className = allPlayersReady
         ? 'button-glitchy-yellow'
         : 'button-glitchy-yellow disabled';
       return (
-        <button className={className} onClick={this.startGame}>
+        <button className={className} onClick={startGame}>
           Start the game
         </button>
       );
     }
     if (status === 'paused') {
       return (
-        <button className="button-glitchy-yellow" onClick={this.startGame}>
+        <button className="button-glitchy-yellow" onClick={startGame}>
           Unpause the game
         </button>
       );
     }
     if (status === 'ended') {
       return (
-        <button className="button-glitchy-yellow" onClick={this.resetGame}>
+        <button className="button-glitchy-yellow" onClick={resetGame}>
           Start a new game
         </button>
       );
     }
+
     return null;
   };
 
-  render() {
-    const { players } = this.props.game;
-    return (
-      <div className="observer-lobby">
-        <h1 className="text-glitchy-large">Code in the Dark</h1>
-        {this.renderTitle()}
-        <div className="observer-lobby-player-list">
-          <LobbyPlayer
-            player={players[0]}
-            namePlaceholder="Player 1"
-            onPlayerKick={this.onPlayerKick}
-          />
-          <LobbyPlayer
-            player={players[1]}
-            namePlaceholder="Player 2"
-            onPlayerKick={this.onPlayerKick}
-          />
-        </div>
-        {this.renderCallToAction()}
+  return (
+    <div className="observer-lobby">
+      <h1 className="text-glitchy-large">Code in the Dark</h1>
+      {renderTitle()}
+      <div className="observer-lobby-player-list">
+        <LobbyPlayer player={players[0]} namePlaceholder="Player 1" onPlayerKick={onPlayerKick} />
+        <LobbyPlayer player={players[1]} namePlaceholder="Player 2" onPlayerKick={onPlayerKick} />
       </div>
-    );
-  }
-}
+      {renderCallToAction()}
+    </div>
+  );
+};
 
-export const ObserverLobby = withSocket(ObserverLobbyComponent);
+export const ObserverLobby = withSocket(React.memo(ObserverLobbyComponent));
