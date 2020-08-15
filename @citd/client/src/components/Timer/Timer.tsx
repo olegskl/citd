@@ -7,44 +7,40 @@ import './Timer.css';
 
 type TimerProps = GameContext & ISocketContext;
 
-interface TimerState {
+type Time = {
   minutes: number;
   seconds: number;
-}
+};
 
-class TimerComponent extends React.PureComponent<TimerProps, TimerState> {
-  state: TimerState = {
+const TimerComponent: React.FC<TimerProps> = ({ socket, game }) => {
+  const [{ seconds, minutes }, setTime] = React.useState<Time>({
     seconds: 0,
     minutes: 0,
-  };
+  });
 
-  componentDidMount() {
-    this.setTime(this.props.game.timeRemaining);
-    this.props.socket.on('timeRemaining', this.setTime);
-  }
+  React.useEffect(() => {
+    const setActualTime = (secondsRemaining: number) => {
+      const minutes = Math.floor(secondsRemaining / 60);
+      const seconds = secondsRemaining - minutes * 60;
+      setTime({ minutes, seconds });
+    };
 
-  componentWillUnmount() {
-    this.props.socket.off('timeRemaining', this.setTime);
-  }
+    setActualTime(game.timeRemaining);
+    socket.on('timeRemaining', setActualTime);
 
-  private setTime = (secondsRemaining: number) => {
-    const minutes = Math.floor(secondsRemaining / 60);
-    const seconds = secondsRemaining - minutes * 60;
-    this.setState({ minutes, seconds });
-  };
+    return () => {
+      socket.off('timeRemaining', setActualTime);
+    };
+  }, [socket, game]);
 
-  render() {
-    const { minutes, seconds } = this.state;
+  const minutesText = minutes < 10 ? `0${minutes}` : minutes;
+  const secondsText = seconds < 10 ? `0${seconds}` : seconds;
 
-    const minutesText = minutes < 10 ? `0${minutes}` : minutes;
-    const secondsText = seconds < 10 ? `0${seconds}` : seconds;
-
-    return (
-      <div className="game-timer">
-        {minutesText}:{secondsText}
-      </div>
-    );
-  }
-}
+  return (
+    <div className="game-timer">
+      {minutesText}:{secondsText}
+    </div>
+  );
+};
 
 export const Timer = withSocket(withGame(TimerComponent));
