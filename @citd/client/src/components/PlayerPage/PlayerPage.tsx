@@ -34,4 +34,4 @@ const PlayerPageComponent: React.FC<PlayerPageProps> = ({ socket, user, game }) 
   return <Playground />;
 };
 
-export const PlayerPage = withSocket(withUser(withGame(PlayerPageComponent)));
+export const PlayerPage = withSocket(withUser(withGame(React.memo(PlayerPageComponent))));
