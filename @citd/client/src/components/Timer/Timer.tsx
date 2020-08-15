@@ -43,4 +43,4 @@ const TimerComponent: React.FC<TimerProps> = ({ socket, game }) => {
   );
 };
 
-export const Timer = withSocket(withGame(TimerComponent));
+export const Timer = withSocket(withGame(React.memo(TimerComponent)));
