@@ -5,45 +5,36 @@ import { ISocketContext, withSocket } from './socket';
 
 const GameContext = React.createContext<Game | undefined>(undefined);
 
-export interface GameContext {
+export type GameContext = {
   game: Game;
-}
+};
 
-interface GameProviderState {
-  loading: boolean;
-  game?: Game;
-}
+const GameProviderComponent: React.FC<ISocketContext> = ({ socket, children }) => {
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const [game, setGame] = React.useState<Game>();
 
-class GameProviderComponent extends React.Component<ISocketContext, GameProviderState> {
-  state: GameProviderState = {
-    loading: true,
+  const onGame = (game: Game) => {
+    setLoading(false);
+    setGame(game);
   };
 
-  componentDidMount() {
-    this.props.socket.on('game', this.onGame);
-    this.props.socket.emit('getGame');
+  React.useEffect(() => {
+    socket.on('game', onGame);
+    socket.emit('getGame');
+
+    return () => {
+      socket.off('game', onGame);
+    };
+  }, [socket]);
+
+  // Loading state:
+  if (loading) {
+    return <span>Fetching game...</span>;
   }
 
-  componentWillUnmount() {
-    this.props.socket.off('game', this.onGame);
-  }
-
-  private onGame = (game: Game) => {
-    this.setState({ loading: false, game });
-  };
-
-  render() {
-    const { loading, game } = this.state;
-
-    // Loading state:
-    if (loading) {
-      return 'Fetching game...';
-    }
-
-    // User is available:
-    return <GameContext.Provider value={game}>{this.props.children}</GameContext.Provider>;
-  }
-}
+  // User is available:
+  return <GameContext.Provider value={game}>{children}</GameContext.Provider>;
+};
 
 export const GameProvider = withSocket(GameProviderComponent);
 
