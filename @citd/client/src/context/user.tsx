@@ -6,60 +6,51 @@ import { LoginPage } from '../components/LoginPage';
 
 const UserContext = React.createContext<User | undefined>(undefined);
 
-export interface UserContext {
+export type UserContext = {
   user: User;
-}
+};
 
-interface UserProviderState {
-  loading: boolean;
-  user?: User;
-}
+const UserProviderComponent: React.FC<ISocketContext> = ({ socket, children }) => {
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const [user, setUser] = React.useState<User>();
 
-class UserProviderComponent extends React.Component<ISocketContext, UserProviderState> {
-  state: UserProviderState = {
-    loading: true,
-  };
-
-  componentDidMount() {
-    this.props.socket.on('user', this.onUser);
-    const userId = window.sessionStorage.getItem('citd-user-id');
-    if (userId) {
-      this.props.socket.emit('getUser', userId);
-    } else {
-      this.setState({ loading: false });
-    }
-  }
-
-  componentWillUnmount() {
-    this.props.socket.off('user', this.onUser);
-  }
-
-  private onUser = (user: User) => {
+  const onUser = (user: User) => {
     if (user) {
-      this.setState({ loading: false, user });
+      setUser(user);
+      setLoading(false);
       window.sessionStorage.setItem('citd-user-id', user.id);
     } else {
-      this.setState({ loading: false });
+      setLoading(false);
     }
   };
 
-  render() {
-    const { loading, user } = this.state;
-
-    // Loading state:
-    if (loading) {
-      return 'Fetching user...';
+  React.useEffect(() => {
+    socket.on('user', onUser);
+    const userId = window.sessionStorage.getItem('citd-user-id');
+    if (userId) {
+      socket.emit('getUser', userId);
+    } else {
+      setLoading(false);
     }
 
-    // Login state:
-    if (!user) {
-      return <LoginPage />;
-    }
+    return () => {
+      socket.off('user', onUser);
+    };
+  }, [socket]);
 
-    // User is available:
-    return <UserContext.Provider value={user}>{this.props.children}</UserContext.Provider>;
+  // Loading state:
+  if (loading) {
+    return <span>Fetching user...</span>;
   }
-}
+
+  // Login state:
+  if (!user) {
+    return <LoginPage />;
+  }
+
+  // User is available:
+  return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
+};
 
 export const UserProvider = withSocket(UserProviderComponent);
 

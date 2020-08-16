@@ -14,8 +14,8 @@ const GameProviderComponent: React.FC<ISocketContext> = ({ socket, children }) =
   const [game, setGame] = React.useState<Game>();
 
   const onGame = (game: Game) => {
-    setLoading(false);
     setGame(game);
+    setLoading(false);
   };
 
   React.useEffect(() => {
