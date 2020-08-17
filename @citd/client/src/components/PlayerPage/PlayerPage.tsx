@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { GameStatuses } from '@citd/shared';
 
 import { GameContext, withGame } from '../../context/game';
 import { ISocketContext, withSocket } from '../../context/socket';
@@ -23,11 +24,11 @@ const PlayerPageComponent: React.FC<PlayerPageProps> = ({ socket, user, game }) 
   // Waiting state:
   const isPlayerInGame = game.players.some((player) => player.id === user.id);
 
-  if (game.status === 'waiting' || !isPlayerInGame) {
+  if (game.status === GameStatuses.WAITING || !isPlayerInGame) {
     return <PlayerLobby />;
   }
   // Ended state:
-  if (game.status === 'ended') {
+  if (game.status === GameStatuses.ENDED) {
     return <GameOver />;
   }
   // Playing (and paused as overlay) state:

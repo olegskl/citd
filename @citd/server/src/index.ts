@@ -1,4 +1,4 @@
-import { Game } from '@citd/shared';
+import { Game, GameStatuses } from '@citd/shared';
 import * as http from 'http';
 import * as WebSocket from 'ws';
 
@@ -30,7 +30,7 @@ server.listen(3000, '127.0.0.1');
 ws.on('connection', client => {
 
   const handleGameTick = (game: Game) => {
-    const message = game.status === 'playing'
+    const message = game.status === GameStatuses.PLAYING
       ? JSON.stringify(['timeRemaining', game.timeRemaining])
       : JSON.stringify(['game', game]);
     ws.clients.forEach(c => {

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { GameStatuses } from '@citd/shared';
 
 import { GameContext } from '../../../context/game';
 import { ISocketContext, withSocket } from '../../../context/socket';
@@ -37,13 +38,13 @@ const ObserverControlsComponent: React.FC<ObserverLobbyProps> = ({ socket, game 
   };
 
   const renderTitle = () => {
-    if (game.status === 'playing') {
+    if (game.status === GameStatuses.PLAYING) {
       return <div className="text-glitchy-medium">Time is running out!</div>;
     }
-    if (game.status === 'paused') {
+    if (game.status === GameStatuses.PAUSED) {
       return <div className="text-glitchy-medium">Game is paused...</div>;
     }
-    if (game.status === 'ended') {
+    if (game.status === GameStatuses.ENDED) {
       return <div className="text-glitchy-medium">Game has ended</div>;
     }
 
@@ -58,12 +59,12 @@ const ObserverControlsComponent: React.FC<ObserverLobbyProps> = ({ socket, game 
     <div className="observer-controls">
       <h1 className="text-glitchy-large">Code in the Dark</h1>
       {renderTitle()}
-      {game.status === 'playing' && (
+      {game.status === GameStatuses.PLAYING && (
         <button className="button-glitchy-yellow" onClick={pauseGame}>
           Pause the game
         </button>
       )}
-      {game.status === 'paused' && (
+      {game.status === GameStatuses.PAUSED && (
         <button className="button-glitchy-yellow" onClick={startGame}>
           Unpause the game
         </button>

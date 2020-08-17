@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { GameStatuses } from '@citd/shared';
 
 import { GameContext } from '../../../context/game';
 import { ISocketContext, withSocket } from '../../../context/socket';
@@ -24,7 +25,7 @@ const ObserverLobbyComponent: React.FC<ObserverLobbyProps> = ({ socket, game }) 
   };
 
   const renderTitle = () => {
-    if (status === 'waiting') {
+    if (status === GameStatuses.WAITING) {
       const allPlayersReady = players.length === 2 && players.every((player) => player.readyToPlay);
       return allPlayersReady ? (
         <div className="text-glitchy-medium">We are ready to start!</div>
@@ -32,17 +33,17 @@ const ObserverLobbyComponent: React.FC<ObserverLobbyProps> = ({ socket, game }) 
         <div className="text-glitchy-medium">Waiting for players...</div>
       );
     }
-    if (status === 'paused') {
+    if (status === GameStatuses.PAUSED) {
       return <div className="text-glitchy-medium">Game is paused...</div>;
     }
-    if (status === 'ended') {
+    if (status === GameStatuses.ENDED) {
       return <div className="text-glitchy-medium">Game has ended</div>;
     }
     return null;
   };
 
   const renderCallToAction = () => {
-    if (status === 'waiting') {
+    if (status === GameStatuses.WAITING) {
       const allPlayersReady = players.length === 2 && players.every((player) => player.readyToPlay);
       const className = allPlayersReady
         ? 'button-glitchy-yellow'
@@ -53,14 +54,14 @@ const ObserverLobbyComponent: React.FC<ObserverLobbyProps> = ({ socket, game }) 
         </button>
       );
     }
-    if (status === 'paused') {
+    if (status === GameStatuses.PAUSED) {
       return (
         <button className="button-glitchy-yellow" onClick={startGame}>
           Unpause the game
         </button>
       );
     }
-    if (status === 'ended') {
+    if (status === GameStatuses.ENDED) {
       return (
         <button className="button-glitchy-yellow" onClick={resetGame}>
           Start a new game

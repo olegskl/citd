@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { GameStatuses } from '@citd/shared';
 
 import { GameContext, withGame } from '../../context/game';
 import { ISocketContext, withSocket } from '../../context/socket';
@@ -21,7 +22,11 @@ const ObserverPageComponent: React.FC<ObserverPageProps> = ({ socket, game }) =>
     };
   }, [socket]);
 
-  if (game.status === 'playing' || game.status === 'paused' || game.status === 'ended') {
+  if (
+    game.status === GameStatuses.PLAYING ||
+    game.status === GameStatuses.PAUSED ||
+    game.status === GameStatuses.ENDED
+  ) {
     return (
       <div className="viewer-list">
         <Viewer player={game.players[0]} />

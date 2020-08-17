@@ -1,4 +1,4 @@
-import { isChange, isSelections, Operation } from '@citd/shared';
+import { isChange, isSelections, Operation, GameStatuses } from '@citd/shared';
 import * as CodeMirror from 'codemirror';
 import applyEmmetPlugin from '@emmetio/codemirror-plugin';
 import * as React from 'react';
@@ -90,11 +90,11 @@ class PlaygroundComponent extends React.PureComponent<PlaygroundProps> {
     if (!this.codeEditor) {
       return;
     }
-    if (this.props.game.status === 'playing') {
-      if (prevProps.game.status !== 'playing') {
+    if (this.props.game.status === GameStatuses.PLAYING) {
+      if (prevProps.game.status !== GameStatuses.PLAYING) {
         this.codeEditor.setOption('readOnly', false);
       }
-    } else if (prevProps.game.status === 'playing') {
+    } else if (prevProps.game.status === GameStatuses.PLAYING) {
       this.codeEditor.setOption('readOnly', true);
     }
   }
@@ -123,7 +123,7 @@ class PlaygroundComponent extends React.PureComponent<PlaygroundProps> {
             <Timer />
             {/* <img src={task} className='gameTask' /> */}
           </div>
-          {game.status === 'paused' && <PlayerPaused />}
+          {game.status === GameStatuses.PAUSED && <PlayerPaused />}
         </div>
       </div>
     );

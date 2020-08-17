@@ -1,4 +1,4 @@
-import { Game } from '@citd/shared';
+import { Game, GameStatuses } from '@citd/shared';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -11,7 +11,7 @@ const callbacks: GameTickCallback[] = [];
 
 function initializeGame(): Game {
   return {
-    status: 'waiting',
+    status: GameStatuses.WAITING,
     timeRemaining: 15 * 60,
     players: []
   };
@@ -34,7 +34,7 @@ export function getGame(): Game {
 }
 
 export function startGame(): Game {
-  game.status = 'playing';
+  game.status = GameStatuses.PLAYING;
   clearInterval(tickTimer);
   tickTimer = setInterval(() => {
     game.timeRemaining -= 1;
@@ -47,13 +47,13 @@ export function startGame(): Game {
 }
 
 export function pauseGame(): Game {
-  game.status = 'paused';
+  game.status = GameStatuses.PAUSED;
   clearInterval(tickTimer);
   return game;
 }
 
 export function endGame(): Game {
-  game.status = 'ended';
+  game.status = GameStatuses.ENDED;
   game.timeRemaining = 0;
   clearInterval(tickTimer);
   callbacks.forEach(callback => callback(game));

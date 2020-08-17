@@ -13,8 +13,15 @@ export interface Player extends User {
   readyToPlay: boolean;
 }
 
+export enum GameStatuses {
+  WAITING = 'waiting',
+  PLAYING = 'playing',
+  PAUSED = 'paused',
+  ENDED = 'ended',
+}
+
 export interface Game {
-  status: 'waiting' | 'playing' | 'paused' | 'ended';
+  status: GameStatuses;
   timeRemaining: number;
   players: Player[];
 }
