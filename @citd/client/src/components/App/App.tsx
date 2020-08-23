@@ -10,15 +10,15 @@ import { PlayerPage } from '../PlayerPage';
 
 export const App: React.FC = () => (
   <SocketProvider>
-    <UserProvider>
-      <GameProvider>
-        <BrowserRouter>
-          <Switch>
-            <Route path="/observer" component={ObserverPage} />
+    <GameProvider>
+      <BrowserRouter>
+        <Switch>
+          <Route path="/observer" component={ObserverPage} />
+          <UserProvider>
             <Route path="/" component={PlayerPage} />
-          </Switch>
-        </BrowserRouter>
-      </GameProvider>
-    </UserProvider>
+          </UserProvider>
+        </Switch>
+      </BrowserRouter>
+    </GameProvider>
   </SocketProvider>
 );
