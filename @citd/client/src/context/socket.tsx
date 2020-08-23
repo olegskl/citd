@@ -6,7 +6,7 @@ interface IApi {
   off: (eventName: string, callback: (...args: any[]) => void) => void;
 }
 
-export const SocketContext = React.createContext<IApi>({} as IApi);
+const SocketContext = React.createContext<IApi | undefined>(undefined);
 
 export type SocketContextType = {
   socket: IApi;
@@ -105,6 +105,14 @@ export class SocketProvider extends React.PureComponent<unknown, ISocketProvider
     return <SocketContext.Provider value={this.api}>{this.props.children}</SocketContext.Provider>;
   }
 }
+
+export const useSocketContext = (): IApi => {
+  const context = React.useContext(SocketContext);
+  if (context === undefined) {
+    throw new Error('useSocketContext must be used within a SocketProvider');
+  }
+  return context;
+};
 
 export function withSocket<T extends SocketContextType>(
   Component: React.ComponentType<T>,

@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { GameContext } from '../../context/game';
-import { SocketContext } from '../../context/socket';
+import { useGameContext } from '../../context/game';
+import { useSocketContext } from '../../context/socket';
 
 import './Timer.css';
 
@@ -11,8 +11,8 @@ type Time = {
 };
 
 const TimerComponent: React.FC = () => {
-  const socket = React.useContext(SocketContext);
-  const game = React.useContext(GameContext);
+  const socket = useSocketContext();
+  const game = useGameContext();
 
   const [{ seconds, minutes }, setTime] = React.useState<Time>({
     seconds: 0,

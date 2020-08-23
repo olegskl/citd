@@ -1,16 +1,16 @@
 import { Game } from '@citd/shared';
 import * as React from 'react';
 
-import { SocketContext } from './socket';
+import { useSocketContext } from './socket';
 
-export const GameContext = React.createContext<Game>({} as Game);
+const GameContext = React.createContext<Game | undefined>(undefined);
 
 export type GameContextType = {
   game: Game;
 };
 
 export const GameProvider: React.FC = ({ children }) => {
-  const socket = React.useContext(SocketContext);
+  const socket = useSocketContext();
   const [loading, setLoading] = React.useState<boolean>(true);
   const [game, setGame] = React.useState<Game>();
 
@@ -35,6 +35,14 @@ export const GameProvider: React.FC = ({ children }) => {
 
   // User is available:
   return <GameContext.Provider value={game}>{children}</GameContext.Provider>;
+};
+
+export const useGameContext = (): Game => {
+  const context = React.useContext(GameContext);
+  if (context === undefined) {
+    throw new Error('useGameContext must be used within a GameProvider');
+  }
+  return context;
 };
 
 export function withGame<T extends GameContextType>(

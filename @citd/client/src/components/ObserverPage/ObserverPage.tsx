@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { GameContext } from '../../context/game';
-import { SocketContext } from '../../context/socket';
+import { useGameContext } from '../../context/game';
+import { useSocketContext } from '../../context/socket';
 
 import { ObserverControls } from './ObserverControls';
 import { ObserverLobby } from './ObserverLobby';
@@ -11,8 +11,8 @@ import { Viewer } from './Viewer';
 import './ObserverPage.css';
 
 const ObserverPageComponent: React.FC = () => {
-  const socket = React.useContext(SocketContext);
-  const game = React.useContext(GameContext);
+  const socket = useSocketContext();
+  const game = useGameContext();
 
   React.useEffect(() => {
     socket.emit('joinChannel', 'observers');

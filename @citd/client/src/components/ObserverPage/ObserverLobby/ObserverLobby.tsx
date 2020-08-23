@@ -1,13 +1,13 @@
 import * as React from 'react';
 
 import { GameContextType } from '../../../context/game';
-import { SocketContext } from '../../../context/socket';
+import { useSocketContext } from '../../../context/socket';
 import { LobbyPlayer } from '../LobbyPlayer';
 
 import './ObserverLobby.css';
 
 const ObserverLobbyComponent: React.FC<GameContextType> = ({ game }) => {
-  const socket = React.useContext(SocketContext);
+  const socket = useSocketContext();
   const { players, status } = game;
 
   const onPlayerKick = (playerId: string) => {

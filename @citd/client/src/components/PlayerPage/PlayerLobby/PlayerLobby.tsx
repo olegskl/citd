@@ -1,15 +1,15 @@
 import * as React from 'react';
 
-import { GameContext } from '../../../context/game';
-import { SocketContext } from '../../../context/socket';
-import { UserContext } from '../../../context/user';
+import { useGameContext } from '../../../context/game';
+import { useSocketContext } from '../../../context/socket';
+import { useUserContext } from '../../../context/user';
 
 import './PlayerLobby.css';
 
 const PlayerLobbyComponent: React.FC = () => {
-  const socket = React.useContext(SocketContext);
-  const game = React.useContext(GameContext);
-  const user = React.useContext(UserContext);
+  const socket = useSocketContext();
+  const game = useGameContext();
+  const user = useUserContext();
 
   const onJoinGame = () => {
     socket.emit('joinGame', user.id);

@@ -1,12 +1,12 @@
 import * as React from 'react';
 
 import { GameContextType } from '../../../context/game';
-import { SocketContext } from '../../../context/socket';
+import { useSocketContext } from '../../../context/socket';
 
 import './ObserverControls.css';
 
 const ObserverControlsComponent: React.FC<GameContextType> = ({ game }) => {
-  const socket = React.useContext(SocketContext);
+  const socket = useSocketContext();
   const [areControlsDisplayed, setControlsDisplayed] = React.useState<boolean>(false);
 
   React.useEffect(() => {

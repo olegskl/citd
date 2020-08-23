@@ -1,11 +1,11 @@
 import * as React from 'react';
 
-import { SocketContext } from '../../context/socket';
+import { useSocketContext } from '../../context/socket';
 
 import './LoginPage.css';
 
 const LoginPageComponent: React.FC = () => {
-  const socket = React.useContext(SocketContext);
+  const socket = useSocketContext();
   const [nickname, setNickname] = React.useState<string>('');
 
   const onCreateUser = React.useCallback(() => {

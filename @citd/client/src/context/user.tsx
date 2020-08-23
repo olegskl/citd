@@ -1,17 +1,17 @@
 import { User } from '@citd/shared';
 import * as React from 'react';
 
-import { SocketContext } from './socket';
+import { useSocketContext } from './socket';
 import { LoginPage } from '../components/LoginPage';
 
-export const UserContext = React.createContext<User>({} as User);
+const UserContext = React.createContext<User | undefined>(undefined);
 
 export type UserContextType = {
   user: User;
 };
 
 export const UserProvider: React.FC = ({ children }) => {
-  const socket = React.useContext(SocketContext);
+  const socket = useSocketContext();
   const [loading, setLoading] = React.useState<boolean>(true);
   const [user, setUser] = React.useState<User>();
 
@@ -51,6 +51,14 @@ export const UserProvider: React.FC = ({ children }) => {
 
   // User is available:
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
+};
+
+export const useUserContext = (): User => {
+  const context = React.useContext(UserContext);
+  if (context === undefined) {
+    throw new Error('useUserContext must be used within a UserProvider');
+  }
+  return context;
 };
 
 export function withUser<T extends UserContextType>(
