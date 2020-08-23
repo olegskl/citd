@@ -30,7 +30,11 @@ class PlaygroundComponent extends React.PureComponent<PlaygroundProps> {
   };
 
   componentDidMount() {
-    this.codeEditor = CodeMirror(this.codeEditorRef.current!, {
+    if (!this.codeEditorRef.current) {
+      return;
+    }
+
+    this.codeEditor = CodeMirror(this.codeEditorRef.current, {
       lineNumbers: true,
       mode: 'text/html',
       theme: 'material',

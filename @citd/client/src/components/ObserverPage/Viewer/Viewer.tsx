@@ -29,7 +29,11 @@ class ViewerComponent extends React.PureComponent<ViewerProps, ViewerState> {
   };
 
   componentDidMount() {
-    this.codeViewer = CodeMirror(this.codeViewerRef.current!, {
+    if (!this.codeViewerRef.current) {
+      return;
+    }
+
+    this.codeViewer = CodeMirror(this.codeViewerRef.current, {
       readOnly: true,
       lineNumbers: true,
       mode: 'text/html',
