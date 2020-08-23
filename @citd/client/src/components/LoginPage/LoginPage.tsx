@@ -34,7 +34,7 @@ const LoginPageComponent: React.FC = () => {
     return () => {
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [onCreateUser, setNickname, nickname]);
+  }, [onCreateUser, nickname]);
 
   return (
     <div className="login-page">
