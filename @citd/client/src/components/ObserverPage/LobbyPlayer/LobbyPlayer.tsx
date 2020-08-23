@@ -48,7 +48,12 @@ const LobbyPlayerComponent: React.FC<LobbyPlayerProps> = ({
           skinColor="Light"
         />
       </div>
-      <div className="lobby-player-nickname text-glitchy-medium">{player.name}</div>
+      <div className="lobby-player-nickname text-glitchy-medium">
+        <div
+          className={`lobby-player-status ${player.readyToPlay ? 'lobby-player-status-ready' : ''}`}
+        />
+        {player.name}
+      </div>
     </div>
   );
 };
