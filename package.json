@@ -5,7 +5,8 @@
   "description": "",
   "scripts": {
     "start": "wsrun start",
-    "build": "wsrun build"
+    "build": "wsrun build",
+    "lint": "wsrun --exclude-missing lint"
   },
   "license": "MIT",
   "dependencies": {

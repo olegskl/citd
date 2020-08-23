@@ -41,7 +41,7 @@ export const UserProvider: React.FC = ({ children }) => {
 
   // Loading state:
   if (loading) {
-    return <span>Fetching user...</span>;
+    return <>Fetching user...</>;
   }
 
   // Login state:
