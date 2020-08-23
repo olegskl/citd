@@ -6,11 +6,11 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
 import 'codemirror/mode/htmlmixed/htmlmixed.js';
 
-import { ISocketContext, withSocket } from '../../../context/socket';
+import { SocketContextType, withSocket } from '../../../context/socket';
 
 import './Viewer.css';
 
-interface ViewerProps extends ISocketContext {
+interface ViewerProps extends SocketContextType {
   player: Player;
 }
 

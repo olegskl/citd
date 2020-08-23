@@ -1,13 +1,12 @@
 import * as React from 'react';
 
-import { GameContext } from '../../../context/game';
-import { ISocketContext, withSocket } from '../../../context/socket';
+import { GameContextType } from '../../../context/game';
+import { useSocketContext } from '../../../context/socket';
 
 import './ObserverControls.css';
 
-type ObserverLobbyProps = ISocketContext & GameContext;
-
-const ObserverControlsComponent: React.FC<ObserverLobbyProps> = ({ socket, game }) => {
+const ObserverControlsComponent: React.FC<GameContextType> = ({ game }) => {
+  const socket = useSocketContext();
   const [areControlsDisplayed, setControlsDisplayed] = React.useState<boolean>(false);
 
   React.useEffect(() => {
@@ -75,4 +74,4 @@ const ObserverControlsComponent: React.FC<ObserverLobbyProps> = ({ socket, game 
   );
 };
 
-export const ObserverControls = withSocket(React.memo(ObserverControlsComponent));
+export const ObserverControls = React.memo(ObserverControlsComponent);

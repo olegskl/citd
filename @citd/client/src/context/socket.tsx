@@ -8,9 +8,9 @@ interface IApi {
 
 const SocketContext = React.createContext<IApi | undefined>(undefined);
 
-export interface ISocketContext {
+export type SocketContextType = {
   socket: IApi;
-}
+};
 
 interface ISocketProviderState {
   connected: boolean;
@@ -76,7 +76,7 @@ export class SocketProvider extends React.PureComponent<unknown, ISocketProvider
     }
   };
 
-  private readonly api: ISocketContext['socket'] = {
+  private readonly api: SocketContextType['socket'] = {
     emit: (...args) => {
       if (!this.socket) {
         return;
@@ -106,7 +106,15 @@ export class SocketProvider extends React.PureComponent<unknown, ISocketProvider
   }
 }
 
-export function withSocket<T extends ISocketContext>(
+export const useSocketContext = (): IApi => {
+  const context = React.useContext(SocketContext);
+  if (context === undefined) {
+    throw new Error('useSocketContext must be used within a SocketProvider');
+  }
+  return context;
+};
+
+export function withSocket<T extends SocketContextType>(
   Component: React.ComponentType<T>,
 ): React.FC<Pick<T, Exclude<keyof T, 'socket'>>> {
   return function WrappedComponent(props) {

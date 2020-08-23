@@ -1,18 +1,19 @@
 import * as React from 'react';
 
-import { GameContext, withGame } from '../../context/game';
-import { ISocketContext, withSocket } from '../../context/socket';
+import { useGameContext } from '../../context/game';
+import { useSocketContext } from '../../context/socket';
 
 import './Timer.css';
-
-type TimerProps = GameContext & ISocketContext;
 
 type Time = {
   minutes: number;
   seconds: number;
 };
 
-const TimerComponent: React.FC<TimerProps> = ({ socket, game }) => {
+const TimerComponent: React.FC = () => {
+  const socket = useSocketContext();
+  const game = useGameContext();
+
   const [{ seconds, minutes }, setTime] = React.useState<Time>({
     seconds: 0,
     minutes: 0,
@@ -43,4 +44,4 @@ const TimerComponent: React.FC<TimerProps> = ({ socket, game }) => {
   );
 };
 
-export const Timer = withSocket(withGame(React.memo(TimerComponent)));
+export const Timer = React.memo(TimerComponent);
