@@ -9,13 +9,16 @@ import './ObserverLobby.css';
 const ObserverLobbyComponent: React.FC<GameContextType> = ({ game }) => {
   const socket = useSocketContext();
   const { players, status } = game;
+  const allPlayersReady = players.length === 2 && players.every((player) => player.readyToPlay);
 
   const onPlayerKick = (playerId: string) => {
     socket.emit('kickPlayerFromGame', playerId);
   };
 
   const startGame = () => {
-    socket.emit('startGame');
+    if (allPlayersReady) {
+      socket.emit('startGame');
+    }
   };
 
   const resetGame = () => {
@@ -24,7 +27,6 @@ const ObserverLobbyComponent: React.FC<GameContextType> = ({ game }) => {
 
   const renderTitle = () => {
     if (status === 'waiting') {
-      const allPlayersReady = players.length === 2 && players.every((player) => player.readyToPlay);
       return allPlayersReady ? (
         <div className="text-glitchy-medium">We are ready to start!</div>
       ) : (
@@ -42,7 +44,6 @@ const ObserverLobbyComponent: React.FC<GameContextType> = ({ game }) => {
 
   const renderCallToAction = () => {
     if (status === 'waiting') {
-      const allPlayersReady = players.length === 2 && players.every((player) => player.readyToPlay);
       const className = allPlayersReady
         ? 'button-glitchy-yellow'
         : 'button-glitchy-yellow disabled';

@@ -12,6 +12,20 @@
 }
 
 .lobby-player-nickname {
+  display: flex;
+  align-items: center;
   margin-top: 1.5rem;
   font-size: 1.5rem;
 }
+
+.lobby-player-status {
+  width: 22px;
+  height: 22px;
+  background: red;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.lobby-player-status-ready {
+  background: green;
+} 
