@@ -1,10 +1,11 @@
 import * as React from 'react';
 
-import { ISocketContext, withSocket } from '../../context/socket';
+import { SocketContext } from '../../context/socket';
 
 import './LoginPage.css';
 
-const LoginPageComponent: React.FC<ISocketContext> = ({ socket }) => {
+const LoginPageComponent: React.FC = () => {
+  const socket = React.useContext(SocketContext);
   const [nickname, setNickname] = React.useState<string>('');
 
   const onCreateUser = React.useCallback(() => {
@@ -33,7 +34,7 @@ const LoginPageComponent: React.FC<ISocketContext> = ({ socket }) => {
     return () => {
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [onCreateUser]);
+  }, [onCreateUser, setNickname, nickname]);
 
   return (
     <div className="login-page">
@@ -53,4 +54,4 @@ const LoginPageComponent: React.FC<ISocketContext> = ({ socket }) => {
   );
 };
 
-export const LoginPage = withSocket(React.memo(LoginPageComponent));
+export const LoginPage = React.memo(LoginPageComponent);

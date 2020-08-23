@@ -1,16 +1,18 @@
 import * as React from 'react';
 
-import { GameContext, withGame } from '../../context/game';
-import { ISocketContext, withSocket } from '../../context/socket';
-import { UserContext, withUser } from '../../context/user';
+import { GameContext } from '../../context/game';
+import { SocketContext } from '../../context/socket';
+import { UserContext } from '../../context/user';
 
 import { GameOver } from './GameOver';
 import { PlayerLobby } from './PlayerLobby';
 import { Playground } from './Playground';
 
-type PlayerPageProps = ISocketContext & UserContext & GameContext;
+const PlayerPageComponent: React.FC = () => {
+  const socket = React.useContext(SocketContext);
+  const game = React.useContext(GameContext);
+  const user = React.useContext(UserContext);
 
-const PlayerPageComponent: React.FC<PlayerPageProps> = ({ socket, user, game }) => {
   React.useEffect(() => {
     socket.emit('joinChannel', 'players');
     socket.emit('joinGame', user.id);
@@ -34,4 +36,4 @@ const PlayerPageComponent: React.FC<PlayerPageProps> = ({ socket, user, game }) 
   return <Playground />;
 };
 
-export const PlayerPage = withSocket(withUser(withGame(React.memo(PlayerPageComponent))));
+export const PlayerPage = React.memo(PlayerPageComponent);

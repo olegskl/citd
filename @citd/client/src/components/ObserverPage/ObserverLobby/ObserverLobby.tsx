@@ -1,14 +1,13 @@
 import * as React from 'react';
 
-import { GameContext } from '../../../context/game';
-import { ISocketContext, withSocket } from '../../../context/socket';
+import { GameContextType } from '../../../context/game';
+import { SocketContext } from '../../../context/socket';
 import { LobbyPlayer } from '../LobbyPlayer';
 
 import './ObserverLobby.css';
 
-type ObserverLobbyProps = ISocketContext & GameContext;
-
-const ObserverLobbyComponent: React.FC<ObserverLobbyProps> = ({ socket, game }) => {
+const ObserverLobbyComponent: React.FC<GameContextType> = ({ game }) => {
+  const socket = React.useContext(SocketContext);
   const { players, status } = game;
 
   const onPlayerKick = (playerId: string) => {
@@ -83,4 +82,4 @@ const ObserverLobbyComponent: React.FC<ObserverLobbyProps> = ({ socket, game }) 
   );
 };
 
-export const ObserverLobby = withSocket(React.memo(ObserverLobbyComponent));
+export const ObserverLobby = React.memo(ObserverLobbyComponent);

@@ -1,17 +1,18 @@
 import { Game } from '@citd/shared';
 import * as React from 'react';
 
-import { ISocketContext, withSocket } from './socket';
+import { SocketContext } from './socket';
 
-const GameContext = React.createContext<Game | undefined>(undefined);
+export const GameContext = React.createContext<Game>({} as Game);
 
-export type GameContext = {
+export type GameContextType = {
   game: Game;
 };
 
-const GameProviderComponent: React.FC<ISocketContext> = ({ socket, children }) => {
+const GameProviderComponent: React.FC = ({ children }) => {
+  const socket = React.useContext(SocketContext);
   const [loading, setLoading] = React.useState<boolean>(true);
-  const [game, setGame] = React.useState<Game>();
+  const [game, setGame] = React.useState<Game>({} as Game);
 
   const onGame = (game: Game) => {
     setGame(game);
@@ -36,9 +37,9 @@ const GameProviderComponent: React.FC<ISocketContext> = ({ socket, children }) =
   return <GameContext.Provider value={game}>{children}</GameContext.Provider>;
 };
 
-export const GameProvider = withSocket(GameProviderComponent);
+export const GameProvider = GameProviderComponent;
 
-export function withGame<T extends GameContext>(
+export function withGame<T extends GameContextType>(
   Component: React.ComponentType<T>,
 ): React.FC<Pick<T, Exclude<keyof T, 'game'>>> {
   return function WrappedComponent(props) {

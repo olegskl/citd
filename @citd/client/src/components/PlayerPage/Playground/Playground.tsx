@@ -9,9 +9,9 @@ import 'codemirror/theme/material.css';
 import 'codemirror/keymap/sublime.js';
 import 'codemirror/mode/htmlmixed/htmlmixed.js';
 
-import { GameContext, withGame } from '../../../context/game';
-import { ISocketContext, withSocket } from '../../../context/socket';
-import { UserContext, withUser } from '../../../context/user';
+import { GameContextType, withGame } from '../../../context/game';
+import { SocketContextType, withSocket } from '../../../context/socket';
+import { UserContextType, withUser } from '../../../context/user';
 import { Timer } from '../../Timer';
 import { PlayerPaused } from '../PlayerPaused';
 
@@ -19,7 +19,7 @@ import { task, color } from '../../../task';
 
 import './Playground.css';
 
-type PlaygroundProps = ISocketContext & UserContext & GameContext;
+type PlaygroundProps = SocketContextType & UserContextType & GameContextType;
 
 class PlaygroundComponent extends React.PureComponent<PlaygroundProps> {
   private codeEditor?: CodeMirror.Editor;

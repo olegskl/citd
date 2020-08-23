@@ -6,11 +6,11 @@ interface IApi {
   off: (eventName: string, callback: (...args: any[]) => void) => void;
 }
 
-const SocketContext = React.createContext<IApi | undefined>(undefined);
+export const SocketContext = React.createContext<IApi>({} as IApi);
 
-export interface ISocketContext {
+export type SocketContextType = {
   socket: IApi;
-}
+};
 
 interface ISocketProviderState {
   connected: boolean;
@@ -76,7 +76,7 @@ export class SocketProvider extends React.PureComponent<unknown, ISocketProvider
     }
   };
 
-  private readonly api: ISocketContext['socket'] = {
+  private readonly api: SocketContextType['socket'] = {
     emit: (...args) => {
       if (!this.socket) {
         return;
@@ -106,7 +106,7 @@ export class SocketProvider extends React.PureComponent<unknown, ISocketProvider
   }
 }
 
-export function withSocket<T extends ISocketContext>(
+export function withSocket<T extends SocketContextType>(
   Component: React.ComponentType<T>,
 ): React.FC<Pick<T, Exclude<keyof T, 'socket'>>> {
   return function WrappedComponent(props) {

@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { GameContext, withGame } from '../../context/game';
-import { ISocketContext, withSocket } from '../../context/socket';
+import { GameContext } from '../../context/game';
+import { SocketContext } from '../../context/socket';
 
 import { ObserverControls } from './ObserverControls';
 import { ObserverLobby } from './ObserverLobby';
@@ -10,9 +10,10 @@ import { Viewer } from './Viewer';
 
 import './ObserverPage.css';
 
-type ObserverPageProps = ISocketContext & GameContext;
+const ObserverPageComponent: React.FC = () => {
+  const socket = React.useContext(SocketContext);
+  const game = React.useContext(GameContext);
 
-const ObserverPageComponent: React.FC<ObserverPageProps> = ({ socket, game }) => {
   React.useEffect(() => {
     socket.emit('joinChannel', 'observers');
 
@@ -35,4 +36,4 @@ const ObserverPageComponent: React.FC<ObserverPageProps> = ({ socket, game }) =>
   return <ObserverLobby game={game} />;
 };
 
-export const ObserverPage = withSocket(withGame(React.memo(ObserverPageComponent)));
+export const ObserverPage = React.memo(ObserverPageComponent);

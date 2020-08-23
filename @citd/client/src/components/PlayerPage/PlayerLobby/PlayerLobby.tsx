@@ -1,14 +1,16 @@
 import * as React from 'react';
 
-import { GameContext, withGame } from '../../../context/game';
-import { ISocketContext, withSocket } from '../../../context/socket';
-import { UserContext, withUser } from '../../../context/user';
+import { GameContext } from '../../../context/game';
+import { SocketContext } from '../../../context/socket';
+import { UserContext } from '../../../context/user';
 
 import './PlayerLobby.css';
 
-type LobbyProps = ISocketContext & UserContext & GameContext;
+const PlayerLobbyComponent: React.FC = () => {
+  const socket = React.useContext(SocketContext);
+  const game = React.useContext(GameContext);
+  const user = React.useContext(UserContext);
 
-const PlayerLobbyComponent: React.FC<LobbyProps> = ({ socket, user, game }) => {
   const onJoinGame = () => {
     socket.emit('joinGame', user.id);
   };
@@ -56,4 +58,4 @@ const PlayerLobbyComponent: React.FC<LobbyProps> = ({ socket, user, game }) => {
   );
 };
 
-export const PlayerLobby = withSocket(withUser(withGame(React.memo(PlayerLobbyComponent))));
+export const PlayerLobby = React.memo(PlayerLobbyComponent);

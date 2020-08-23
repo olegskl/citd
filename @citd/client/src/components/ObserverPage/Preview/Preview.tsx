@@ -1,13 +1,11 @@
 import * as React from 'react';
 
-import { ISocketContext, withSocket } from '../../../context/socket';
 import { Timer } from '../../Timer';
-
 import { task, color } from '../../../task';
 
 import './Preview.css';
 
-const PreviewComponent: React.FC<ISocketContext> = () => (
+const PreviewComponent: React.FC = () => (
   <div className="preview">
     <div
       className="html-viewer box-glitchy-white"
@@ -19,4 +17,4 @@ const PreviewComponent: React.FC<ISocketContext> = () => (
   </div>
 );
 
-export const Preview = withSocket(PreviewComponent);
+export const Preview = PreviewComponent;
