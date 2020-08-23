@@ -9,10 +9,10 @@ export type GameContextType = {
   game: Game;
 };
 
-const GameProviderComponent: React.FC = ({ children }) => {
+export const GameProvider: React.FC = ({ children }) => {
   const socket = React.useContext(SocketContext);
   const [loading, setLoading] = React.useState<boolean>(true);
-  const [game, setGame] = React.useState<Game>({} as Game);
+  const [game, setGame] = React.useState<Game>();
 
   const onGame = (game: Game) => {
     setGame(game);
@@ -29,15 +29,13 @@ const GameProviderComponent: React.FC = ({ children }) => {
   }, [socket]);
 
   // Loading state:
-  if (loading) {
+  if (loading || !game) {
     return <span>Fetching game...</span>;
   }
 
   // User is available:
   return <GameContext.Provider value={game}>{children}</GameContext.Provider>;
 };
-
-export const GameProvider = GameProviderComponent;
 
 export function withGame<T extends GameContextType>(
   Component: React.ComponentType<T>,

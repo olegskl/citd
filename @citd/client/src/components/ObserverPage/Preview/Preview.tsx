@@ -5,7 +5,7 @@ import { task, color } from '../../../task';
 
 import './Preview.css';
 
-const PreviewComponent: React.FC = () => (
+export const Preview: React.FC = () => (
   <div className="preview">
     <div
       className="html-viewer box-glitchy-white"
@@ -16,5 +16,3 @@ const PreviewComponent: React.FC = () => (
     </div>
   </div>
 );
-
-export const Preview = PreviewComponent;

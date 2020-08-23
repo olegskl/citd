@@ -10,7 +10,7 @@ export type UserContextType = {
   user: User;
 };
 
-const UserProviderComponent: React.FC = ({ children }) => {
+export const UserProvider: React.FC = ({ children }) => {
   const socket = React.useContext(SocketContext);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [user, setUser] = React.useState<User>();
@@ -52,8 +52,6 @@ const UserProviderComponent: React.FC = ({ children }) => {
   // User is available:
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 };
-
-export const UserProvider = UserProviderComponent;
 
 export function withUser<T extends UserContextType>(
   Component: React.ComponentType<T>,
