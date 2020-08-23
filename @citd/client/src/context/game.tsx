@@ -30,7 +30,7 @@ export const GameProvider: React.FC = ({ children }) => {
 
   // Loading state:
   if (loading || !game) {
-    return <span>Fetching game...</span>;
+    return <>Fetching game...</>;
   }
 
   // User is available:
