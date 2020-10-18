@@ -6,11 +6,11 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
 import 'codemirror/mode/htmlmixed/htmlmixed.js';
 
-import { SocketContextType, withSocket } from '../../../context/socket';
+import { useSocketContext } from '../../../context/socket';
 
 import './Viewer.css';
 
-type ViewerProps = SocketContextType & {
+type ViewerProps = {
   player: Player;
 };
 
@@ -18,17 +18,23 @@ type ViewerState =
   | { iframeAPos: 'above'; iframeBPos: 'below'; iframeADoc?: string; iframeBDoc?: string }
   | { iframeAPos: 'below'; iframeBPos: 'above'; iframeADoc?: string; iframeBDoc?: string };
 
-const ViewerComponent: React.FC<ViewerProps> = props => {
+const ViewerComponent: React.FC<ViewerProps> = ({ player }) => {
+  const socket = useSocketContext();
+
   const [codeViewer, setCodeViewer] = React.useState<CodeMirror.Editor>();
   const initCodeViewer = React.useCallback((element: HTMLDivElement | null) => {
-    if (!element) { return; }
-    setCodeViewer(CodeMirror(element, {
-      readOnly: true,
-      lineNumbers: true,
-      mode: 'text/html',
-      theme: 'material',
-      tabSize: 2,
-    }));
+    if (!element) {
+      return;
+    }
+    setCodeViewer(
+      CodeMirror(element, {
+        readOnly: true,
+        lineNumbers: true,
+        mode: 'text/html',
+        theme: 'material',
+        tabSize: 2,
+      }),
+    );
   }, []);
 
   const isOperationBatched = React.useRef<boolean>(false);
@@ -39,15 +45,17 @@ const ViewerComponent: React.FC<ViewerProps> = props => {
   }));
 
   const onLoadA = React.useCallback(() => {
-    setState(prevState => ({ ...prevState, iframeAPos: 'above', iframeBPos: 'below' }));
+    setState((prevState) => ({ ...prevState, iframeAPos: 'above', iframeBPos: 'below' }));
   }, []);
 
   const onLoadB = React.useCallback(() => {
-    setState(prevState => ({ ...prevState, iframeAPos: 'below', iframeBPos: 'above' }));
+    setState((prevState) => ({ ...prevState, iframeAPos: 'below', iframeBPos: 'above' }));
   }, []);
 
   React.useEffect(() => {
-    if (!codeViewer) { return; }
+    if (!codeViewer) {
+      return;
+    }
 
     const applyChange = (change: Change) => {
       const { text, from, to, origin } = change;
@@ -69,7 +77,7 @@ const ViewerComponent: React.FC<ViewerProps> = props => {
     };
 
     const applyBatchedOperation = (playerId: string, operation: Operation) => {
-      if (playerId !== props.player.id) {
+      if (playerId !== player.id) {
         return;
       }
 
@@ -97,16 +105,16 @@ const ViewerComponent: React.FC<ViewerProps> = props => {
             ? { iframeBPos: 'above', iframeAPos: 'below', iframeADoc, iframeBDoc }
             : { iframeAPos: 'above', iframeBPos: 'below', iframeADoc, iframeBDoc: doc }
           : iframeADoc === doc
-            ? { iframeAPos: 'above', iframeBPos: 'below', iframeADoc, iframeBDoc }
-            : { iframeAPos: 'below', iframeBPos: 'above', iframeADoc: doc, iframeBDoc };
+          ? { iframeAPos: 'above', iframeBPos: 'below', iframeADoc, iframeBDoc }
+          : { iframeAPos: 'below', iframeBPos: 'above', iframeADoc: doc, iframeBDoc };
       });
     };
 
     const onPlayerTimeline = (playerId: string, operations: Operation[]) => {
-      if (playerId !== props.player.id) {
+      if (playerId !== player.id) {
         return;
       }
-      props.socket.off('playerTimeline', onPlayerTimeline);
+      socket.off('playerTimeline', onPlayerTimeline);
 
       if (!codeViewer) {
         return;
@@ -130,17 +138,17 @@ const ViewerComponent: React.FC<ViewerProps> = props => {
         }
       });
 
-      props.socket.on('operation', applyBatchedOperation);
+      socket.on('operation', applyBatchedOperation);
     };
 
-    props.socket.on('playerTimeline', onPlayerTimeline);
-    props.socket.emit('getPlayerTimeline', props.player.id);
+    socket.on('playerTimeline', onPlayerTimeline);
+    socket.emit('getPlayerTimeline', player.id);
 
     return () => {
       codeViewer.off('change', updateIframe);
-      props.socket.off('operation', applyBatchedOperation);
+      socket.off('operation', applyBatchedOperation);
     };
-  }, [codeViewer]);
+  }, [codeViewer, player.id, socket]);
 
   const { iframeAPos, iframeBPos, iframeADoc, iframeBDoc } = state;
   return (
@@ -163,10 +171,10 @@ const ViewerComponent: React.FC<ViewerProps> = props => {
           />
         )}
       </div>
-      <div className="player-name">{props.player.name}</div>
+      <div className="player-name">{player.name}</div>
       <div ref={initCodeViewer} className="code-viewer box-glitchy-white" />
     </div>
   );
-}
+};
 
-export const Viewer = withSocket(ViewerComponent);
+export const Viewer = React.memo(ViewerComponent);
