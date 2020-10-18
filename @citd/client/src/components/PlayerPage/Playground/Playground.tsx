@@ -9,56 +9,71 @@ import 'codemirror/theme/material.css';
 import 'codemirror/keymap/sublime.js';
 import 'codemirror/mode/htmlmixed/htmlmixed.js';
 
-import { GameContextType, withGame } from '../../../context/game';
-import { SocketContextType, withSocket } from '../../../context/socket';
-import { UserContextType, withUser } from '../../../context/user';
 import { Timer } from '../../Timer';
 import { PlayerPaused } from '../PlayerPaused';
 
+import { useGameContext } from '../../../context/game';
+import { useSocketContext } from '../../../context/socket';
+import { useUserContext } from '../../../context/user';
 import { task, color } from '../../../task';
 
 import './Playground.css';
 
-type PlaygroundProps = SocketContextType & UserContextType & GameContextType;
+const PlaygroundComponent: React.FC = () => {
+  const socket = useSocketContext();
+  const game = useGameContext();
+  const user = useUserContext();
 
-class PlaygroundComponent extends React.PureComponent<PlaygroundProps> {
-  private codeEditor?: CodeMirror.Editor;
-  private codeEditorRef = React.createRef<HTMLDivElement>();
+  const [codeEditor, setCodeEditor] = React.useState<CodeMirror.Editor>();
+  const initCodeEditor = React.useCallback((element: HTMLDivElement | null) => {
+    if (!element) {
+      return;
+    }
+    setCodeEditor(
+      CodeMirror(element, {
+        lineNumbers: true,
+        mode: 'text/html',
+        theme: 'material',
+        tabSize: 2,
+        keyMap: 'sublime',
+        showCursorWhenSelecting: true,
+        extraKeys: {
+          Tab: 'emmetExpandAbbreviation',
+          Enter: 'emmetInsertLineBreak',
+        },
+      }),
+    );
+  }, []);
 
-  state = {
-    isConfirm: false,
-  };
-
-  componentDidMount() {
-    if (!this.codeEditorRef.current) {
+  React.useEffect(() => {
+    if (!codeEditor) {
       return;
     }
 
-    this.codeEditor = CodeMirror(this.codeEditorRef.current, {
-      lineNumbers: true,
-      mode: 'text/html',
-      theme: 'material',
-      tabSize: 2,
-      keyMap: 'sublime',
-      showCursorWhenSelecting: true,
-      extraKeys: {
-        Tab: 'emmetExpandAbbreviation',
-        Enter: 'emmetInsertLineBreak',
-      },
-    });
+    const emitChange = (
+      _instance: CodeMirror.Editor,
+      change: CodeMirror.EditorChangeLinkedList,
+    ) => {
+      socket.emit('operation', user.id, change);
+    };
+
+    const emitSelections = (instance: CodeMirror.Editor) => {
+      const selections = instance.getDoc().listSelections();
+      socket.emit('operation', user.id, selections);
+    };
 
     const onPlayerTimeline = (playerId: string, operations: Operation[]) => {
-      if (playerId !== this.props.user.id) {
+      if (playerId !== user.id) {
         return;
       }
-      this.props.socket.off('playerTimeline', onPlayerTimeline);
+      socket.off('playerTimeline', onPlayerTimeline);
 
-      if (operations.length === 0 || !this.codeEditor) {
+      if (operations.length === 0 || !codeEditor) {
         return;
       }
 
-      const doc = this.codeEditor.getDoc();
-      this.codeEditor.operation(() => {
+      const doc = codeEditor.getDoc();
+      codeEditor.operation(() => {
         // Apply only Changes first:
         operations.forEach((operation) => {
           if (isChange(operation)) {
@@ -72,66 +87,44 @@ class PlaygroundComponent extends React.PureComponent<PlaygroundProps> {
           doc.setSelections(lastOperation);
         }
       });
-      this.codeEditor.focus();
+      codeEditor.focus();
 
-      this.codeEditor.on('change', this.emitChange);
-      this.codeEditor.on('cursorActivity', this.emitSelections);
+      codeEditor.on('change', emitChange);
+      codeEditor.on('cursorActivity', emitSelections);
     };
 
-    this.props.socket.on('playerTimeline', onPlayerTimeline);
-    this.props.socket.emit('getPlayerTimeline', this.props.user.id);
-  }
+    socket.on('playerTimeline', onPlayerTimeline);
+    socket.emit('getPlayerTimeline', user.id);
 
-  componentWillUnmount() {
-    if (!this.codeEditor) {
+    return () => {
+      codeEditor.off('change', emitChange);
+      codeEditor.off('cursorActivity', emitSelections);
+    };
+  }, [codeEditor, socket, user.id]);
+
+  React.useEffect(() => {
+    if (!codeEditor) {
       return;
     }
-    this.codeEditor.off('change', this.emitChange);
-    this.codeEditor.off('cursorActivity', this.emitSelections);
-  }
+    codeEditor.setOption('readOnly', game.status !== 'playing');
+  }, [codeEditor, game.status]);
 
-  componentDidUpdate(prevProps: PlaygroundProps) {
-    if (!this.codeEditor) {
-      return;
-    }
-    if (this.props.game.status === 'playing') {
-      if (prevProps.game.status !== 'playing') {
-        this.codeEditor.setOption('readOnly', false);
-      }
-    } else if (prevProps.game.status === 'playing') {
-      this.codeEditor.setOption('readOnly', true);
-    }
-  }
-
-  private emitChange = (instance: CodeMirror.Editor, change: CodeMirror.EditorChangeLinkedList) => {
-    this.props.socket.emit('operation', this.props.user.id, change);
-  };
-
-  private emitSelections = (instance: CodeMirror.Editor) => {
-    const selections = instance.getDoc().listSelections();
-    this.props.socket.emit('operation', this.props.user.id, selections);
-  };
-
-  render() {
-    const { game } = this.props;
-    return (
-      <div className="playground-wrapper">
-        <h1 className="text-glitchy-large">Code in the Dark</h1>
-        <div className="playground">
-          <div ref={this.codeEditorRef} className="code-editor box-glitchy-white" />
-          <div className="sidebar">
-            <div
-              className="box-glitchy-white sidebar-preview"
-              style={{ backgroundColor: color, backgroundImage: `url(${task})` }}
-            />
-            <Timer />
-            {/* <img src={task} className='gameTask' /> */}
-          </div>
-          {game.status === 'paused' && <PlayerPaused />}
+  return (
+    <div className="playground-wrapper">
+      <h1 className="text-glitchy-large">Code in the Dark</h1>
+      <div className="playground">
+        <div ref={initCodeEditor} className="code-editor box-glitchy-white" />
+        <div className="sidebar">
+          <div
+            className="box-glitchy-white sidebar-preview"
+            style={{ backgroundColor: color, backgroundImage: `url(${task})` }}
+          />
+          <Timer />
         </div>
+        {game.status === 'paused' && <PlayerPaused />}
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
-export const Playground = withSocket(withUser(withGame(PlaygroundComponent)));
+export const Playground = React.memo(PlaygroundComponent);
