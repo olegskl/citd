@@ -10,176 +10,163 @@ import { SocketContextType, withSocket } from '../../../context/socket';
 
 import './Viewer.css';
 
-interface ViewerProps extends SocketContextType {
+type ViewerProps = SocketContextType & {
   player: Player;
-}
+};
 
 type ViewerState =
   | { iframeAPos: 'above'; iframeBPos: 'below'; iframeADoc?: string; iframeBDoc?: string }
   | { iframeAPos: 'below'; iframeBPos: 'above'; iframeADoc?: string; iframeBDoc?: string };
 
-class ViewerComponent extends React.PureComponent<ViewerProps, ViewerState> {
-  private codeViewer?: CodeMirror.Editor;
-  private codeViewerRef = React.createRef<HTMLDivElement>();
-  private isOperationBatched = false;
-
-  state: ViewerState = {
-    iframeAPos: 'above',
-    iframeBPos: 'below',
-  };
-
-  componentDidMount() {
-    if (!this.codeViewerRef.current) {
-      return;
-    }
-
-    this.codeViewer = CodeMirror(this.codeViewerRef.current, {
+const ViewerComponent: React.FC<ViewerProps> = props => {
+  const [codeViewer, setCodeViewer] = React.useState<CodeMirror.Editor>();
+  const initCodeViewer = React.useCallback((element: HTMLDivElement | null) => {
+    if (!element) { return; }
+    setCodeViewer(CodeMirror(element, {
       readOnly: true,
       lineNumbers: true,
       mode: 'text/html',
       theme: 'material',
       tabSize: 2,
-    });
+    }));
+  }, []);
+
+  const isOperationBatched = React.useRef<boolean>(false);
+
+  const [state, setState] = React.useState<ViewerState>(() => ({
+    iframeAPos: 'above',
+    iframeBPos: 'below',
+  }));
+
+  const onLoadA = React.useCallback(() => {
+    setState(prevState => ({ ...prevState, iframeAPos: 'above', iframeBPos: 'below' }));
+  }, []);
+
+  const onLoadB = React.useCallback(() => {
+    setState(prevState => ({ ...prevState, iframeAPos: 'below', iframeBPos: 'above' }));
+  }, []);
+
+  React.useEffect(() => {
+    if (!codeViewer) { return; }
+
+    const applyChange = (change: Change) => {
+      const { text, from, to, origin } = change;
+      codeViewer.getDoc().replaceRange(text.join('\n'), from, to, origin);
+    };
+
+    const applySelections = (selections: Selection[]) => {
+      const doc = codeViewer.getDoc();
+      doc.getAllMarks().forEach((mark) => mark.clear());
+      doc.setSelections(selections);
+      selections.forEach((selection) => {
+        const cursorElement = document.createElement('div');
+        cursorElement.className = 'cursor';
+        doc.setBookmark(selection.head, {
+          widget: cursorElement,
+          insertLeft: true,
+        });
+      });
+    };
+
+    const applyBatchedOperation = (playerId: string, operation: Operation) => {
+      if (playerId !== props.player.id) {
+        return;
+      }
+
+      if (!isOperationBatched.current) {
+        codeViewer.startOperation();
+        isOperationBatched.current = true;
+      }
+
+      if (isChange(operation)) {
+        applyChange(operation);
+      } else {
+        applySelections(operation);
+        if (isOperationBatched.current) {
+          codeViewer.endOperation();
+          isOperationBatched.current = false;
+        }
+      }
+    };
+
+    const updateIframe = (instance: CodeMirror.Editor) => {
+      setState(({ iframeAPos, iframeBPos, iframeADoc, iframeBDoc }) => {
+        const doc = instance.getValue();
+        return iframeAPos === 'above' && iframeBPos === 'below'
+          ? iframeBDoc === doc
+            ? { iframeBPos: 'above', iframeAPos: 'below', iframeADoc, iframeBDoc }
+            : { iframeAPos: 'above', iframeBPos: 'below', iframeADoc, iframeBDoc: doc }
+          : iframeADoc === doc
+            ? { iframeAPos: 'above', iframeBPos: 'below', iframeADoc, iframeBDoc }
+            : { iframeAPos: 'below', iframeBPos: 'above', iframeADoc: doc, iframeBDoc };
+      });
+    };
 
     const onPlayerTimeline = (playerId: string, operations: Operation[]) => {
-      if (playerId !== this.props.player.id) {
+      if (playerId !== props.player.id) {
         return;
       }
-      this.props.socket.off('playerTimeline', onPlayerTimeline);
+      props.socket.off('playerTimeline', onPlayerTimeline);
 
-      if (!this.codeViewer) {
+      if (!codeViewer) {
         return;
       }
 
-      this.codeViewer.on('changes', this.updateIframe);
+      codeViewer.on('changes', updateIframe);
       if (operations.length === 0) {
         return;
       }
-      this.codeViewer.operation(() => {
+      codeViewer.operation(() => {
         // Apply only Changes first:
         operations.forEach((operation) => {
           if (isChange(operation)) {
-            this.applyChange(operation);
+            applyChange(operation);
           }
         });
         // Apply selection if it's the last one:
         const lastOperation = operations[operations.length - 1];
         if (isSelections(lastOperation)) {
-          this.applySelections(lastOperation);
+          applySelections(lastOperation);
         }
       });
 
-      this.props.socket.on('operation', this.applyBatchedOperation);
+      props.socket.on('operation', applyBatchedOperation);
     };
 
-    this.props.socket.on('playerTimeline', onPlayerTimeline);
-    this.props.socket.emit('getPlayerTimeline', this.props.player.id);
-  }
+    props.socket.on('playerTimeline', onPlayerTimeline);
+    props.socket.emit('getPlayerTimeline', props.player.id);
 
-  componentWillUnmount() {
-    if (this.codeViewer) {
-      this.codeViewer.off('change', this.updateIframe);
-    }
-    this.props.socket.off('operation', this.applyBatchedOperation);
-  }
+    return () => {
+      codeViewer.off('change', updateIframe);
+      props.socket.off('operation', applyBatchedOperation);
+    };
+  }, [codeViewer]);
 
-  private applyChange = (change: Change) => {
-    if (!this.codeViewer) {
-      return;
-    }
-    const { text, from, to, origin } = change;
-    this.codeViewer.getDoc().replaceRange(text.join('\n'), from, to, origin);
-  };
-
-  private applySelections = (selections: Selection[]) => {
-    if (!this.codeViewer) {
-      return;
-    }
-    const doc = this.codeViewer.getDoc();
-    doc.getAllMarks().forEach((mark) => mark.clear());
-    doc.setSelections(selections);
-    selections.forEach((selection) => {
-      const cursorElement = document.createElement('div');
-      cursorElement.className = 'cursor';
-      doc.setBookmark(selection.head, {
-        widget: cursorElement,
-        insertLeft: true,
-      });
-    });
-  };
-
-  private applyBatchedOperation = (playerId: string, operation: Operation) => {
-    if (playerId !== this.props.player.id) {
-      return;
-    }
-    if (!this.codeViewer) {
-      return;
-    }
-
-    if (!this.isOperationBatched) {
-      this.codeViewer.startOperation();
-      this.isOperationBatched = true;
-    }
-
-    if (isChange(operation)) {
-      this.applyChange(operation);
-    } else {
-      this.applySelections(operation);
-      if (this.isOperationBatched) {
-        this.codeViewer.endOperation();
-        this.isOperationBatched = false;
-      }
-    }
-  };
-
-  private onLoadA = () => {
-    this.setState({ iframeAPos: 'above', iframeBPos: 'below' });
-  };
-
-  private onLoadB = () => {
-    this.setState({ iframeAPos: 'below', iframeBPos: 'above' });
-  };
-
-  private updateIframe = (instance: CodeMirror.Editor) => {
-    this.setState(({ iframeAPos, iframeBPos, iframeADoc, iframeBDoc }) => {
-      const doc = instance.getValue();
-      return iframeAPos === 'above' && iframeBPos === 'below'
-        ? iframeBDoc === doc
-          ? { iframeBPos: 'above', iframeAPos: 'below', iframeADoc, iframeBDoc }
-          : { iframeAPos, iframeBPos, iframeADoc, iframeBDoc: doc }
-        : iframeADoc === doc
-        ? { iframeAPos: 'above', iframeBPos: 'below', iframeADoc, iframeBDoc }
-        : { iframeAPos, iframeBPos, iframeADoc: doc, iframeBDoc };
-    });
-  };
-
-  render() {
-    const { iframeAPos, iframeBPos, iframeADoc, iframeBDoc } = this.state;
-    return (
-      <div className="viewer">
-        <div className="html-viewer box-glitchy-white">
-          {typeof iframeADoc === 'string' && (
-            <iframe
-              onLoad={this.onLoadA}
-              srcDoc={iframeADoc}
-              className={iframeAPos}
-              sandbox="allow-scripts"
-            />
-          )}
-          {typeof iframeBDoc === 'string' && (
-            <iframe
-              onLoad={this.onLoadB}
-              srcDoc={iframeBDoc}
-              className={iframeBPos}
-              sandbox="allow-scripts"
-            />
-          )}
-        </div>
-        <div className="player-name">{this.props.player.name}</div>
-        <div ref={this.codeViewerRef} className="code-viewer box-glitchy-white" />
+  const { iframeAPos, iframeBPos, iframeADoc, iframeBDoc } = state;
+  return (
+    <div className="viewer">
+      <div className="html-viewer box-glitchy-white">
+        {typeof iframeADoc === 'string' && (
+          <iframe
+            onLoad={onLoadA}
+            srcDoc={iframeADoc}
+            className={iframeAPos}
+            sandbox="allow-scripts"
+          />
+        )}
+        {typeof iframeBDoc === 'string' && (
+          <iframe
+            onLoad={onLoadB}
+            srcDoc={iframeBDoc}
+            className={iframeBPos}
+            sandbox="allow-scripts"
+          />
+        )}
       </div>
-    );
-  }
+      <div className="player-name">{props.player.name}</div>
+      <div ref={initCodeViewer} className="code-viewer box-glitchy-white" />
+    </div>
+  );
 }
 
 export const Viewer = withSocket(ViewerComponent);
