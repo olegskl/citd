@@ -1,112 +1,117 @@
 import * as React from 'react';
 
-interface IApi {
+interface Api {
   emit: (...args: any[]) => void;
   on: (eventName: string, callback: (...args: any[]) => void) => void;
   off: (eventName: string, callback: (...args: any[]) => void) => void;
 }
 
-const SocketContext = React.createContext<IApi | undefined>(undefined);
+const SocketContext = React.createContext<Api | undefined>(undefined);
 
 export type SocketContextType = {
-  socket: IApi;
+  socket: Api;
 };
 
-interface ISocketProviderState {
-  connected: boolean;
-}
+export const SocketProvider: React.FC = ({ children }) => {
+  const [socket, setSocket] = React.useState<WebSocket>();
+  const [status, setStatus] = React.useState<'connect' | 'reconnect' | 'connected'>('connect');
 
-export class SocketProvider extends React.PureComponent<unknown, ISocketProviderState> {
-  private socket?: WebSocket;
-  private reconnectTimer?: number;
-  state: ISocketProviderState = {
-    connected: false,
-  };
+  const messageHandlers = React.useRef<{ [eventName: string]: Array<(...args: any) => void> }>({});
 
-  componentDidMount() {
-    window.addEventListener('beforeunload', this.componentWillUnmount);
-    this.openConnection();
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('beforeunload', this.componentWillUnmount);
-    if (this.socket) {
-      this.removeConnectionListeners();
-      this.socket.close();
-    }
-  }
-
-  private openConnection = () => {
-    this.socket = new WebSocket('ws://127.0.0.1:3000/sock');
-    this.socket.addEventListener('open', this.onOpenConnection);
-    this.socket.addEventListener('close', this.onCloseConnection);
-    this.socket.addEventListener('message', this.onMessage);
-  };
-
-  private removeConnectionListeners = () => {
-    if (!this.socket) {
-      return;
-    }
-    this.socket.removeEventListener('open', this.onOpenConnection);
-    this.socket.removeEventListener('close', this.onCloseConnection);
-    this.socket.removeEventListener('message', this.onMessage);
-  };
-
-  private onOpenConnection = () => {
-    this.setState({ connected: true });
-  };
-
-  private onCloseConnection = () => {
-    this.removeConnectionListeners();
-    if (!this.reconnectTimer) {
-      this.reconnectTimer = window.setTimeout(() => {
-        this.reconnectTimer = undefined;
-        this.openConnection();
+  // Delayed reconnection effect:
+  React.useEffect(() => {
+    if (status === 'reconnect') {
+      console.log('setting up reconnection...');
+      const timerId = window.setTimeout(() => {
+        console.log('reconnecting...');
+        setStatus('connect');
       }, 1000);
+      return () => window.clearTimeout(timerId);
     }
-    this.setState({ connected: false });
-  };
+  }, [status]);
 
-  private messageHandlers: { [eventName: string]: Array<(...args: any) => void> } = {};
+  // Immediate connection effect:
+  React.useEffect(() => {
+    console.log('connection effect');
+    if (!socket) {
+      console.log('connecting...');
+      const newSocket = new WebSocket('ws://127.0.0.1:3000/sock');
 
-  private onMessage = (event: MessageEvent) => {
-    const [eventName, ...args] = JSON.parse(event.data);
-    if (this.messageHandlers[eventName]) {
-      this.messageHandlers[eventName].forEach((handler) => handler(...args));
+      const onMessage = (event: MessageEvent) => {
+        const [eventName, ...args] = JSON.parse(event.data);
+        console.log('received', eventName, args);
+        if (messageHandlers.current[eventName]) {
+          messageHandlers.current[eventName].forEach((handler) => handler(...args));
+        }
+      };
+
+      const cleanup = () => {
+        console.log('cleaning up...');
+        window.removeEventListener('beforeunload', cleanup);
+        newSocket.removeEventListener('open', onOpenConnection);
+        newSocket.removeEventListener('close', onCloseConnection);
+        newSocket.removeEventListener('message', onMessage);
+        newSocket.close();
+      };
+
+      const onOpenConnection = () => {
+        setStatus('connected');
+        setSocket(newSocket);
+        console.log('connected!');
+      };
+
+      const onCloseConnection = () => {
+        console.log('closed connection');
+        cleanup();
+        setSocket(undefined);
+        setStatus('reconnect');
+      };
+
+      newSocket.addEventListener('open', onOpenConnection);
+      newSocket.addEventListener('close', onCloseConnection);
+      newSocket.addEventListener('message', onMessage);
+      newSocket.addEventListener('error', console.error);
+
+      window.addEventListener('beforeunload', cleanup);
+      return cleanup;
     }
-  };
+  }, [socket]);
 
-  private readonly api: SocketContextType['socket'] = {
-    emit: (...args) => {
-      if (!this.socket) {
-        return;
-      }
-      this.socket.send(JSON.stringify(args));
-    },
-    on: (eventName, callback) => {
-      this.messageHandlers[eventName] = this.messageHandlers[eventName] || [];
-      this.messageHandlers[eventName].push(callback);
-    },
-    off: (eventName, callback) => {
-      if (!this.messageHandlers[eventName]) {
-        return;
-      }
-      const index = this.messageHandlers[eventName].indexOf(callback);
-      if (index !== -1) {
-        this.messageHandlers[eventName].splice(index, 1);
-      }
-    },
-  };
+  const api = React.useMemo<SocketContextType['socket']>(() => {
+    return {
+      emit: (...args) => {
+        if (!socket) {
+          return;
+        }
+        console.log('sending', args);
+        socket.send(JSON.stringify(args));
+      },
+      on: (eventName, callback) => {
+        messageHandlers.current[eventName] = messageHandlers.current[eventName] || [];
+        messageHandlers.current[eventName].push(callback);
+      },
+      off: (eventName, callback) => {
+        if (!messageHandlers.current[eventName]) {
+          return;
+        }
+        const index = messageHandlers.current[eventName].indexOf(callback);
+        if (index !== -1) {
+          messageHandlers.current[eventName].splice(index, 1);
+        }
+      },
+    };
+  }, [socket]);
 
-  render() {
-    if (!this.socket || !this.state.connected) {
-      return 'Connecting to the server...';
-    }
-    return <SocketContext.Provider value={this.api}>{this.props.children}</SocketContext.Provider>;
+  console.log('render with socket state', socket?.readyState);
+
+  if (socket && socket.readyState === socket.OPEN) {
+    return <SocketContext.Provider value={api}>{children}</SocketContext.Provider>;
   }
-}
 
-export const useSocketContext = (): IApi => {
+  return <>Connecting to the server...</>;
+};
+
+export const useSocketContext = (): Api => {
   const context = React.useContext(SocketContext);
   if (context === undefined) {
     throw new Error('useSocketContext must be used within a SocketProvider');
