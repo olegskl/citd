@@ -1,12 +1,16 @@
+import { Game } from '@citd/shared';
 import * as React from 'react';
 
-import { GameContextType } from '../../../context/game';
 import { useSocketContext } from '../../../context/socket';
 import { LobbyPlayer } from '../LobbyPlayer';
 
 import './ObserverLobby.css';
 
-const ObserverLobbyComponent: React.FC<GameContextType> = ({ game }) => {
+type ObserverLobbyProps = {
+  game: Game;
+}
+
+const ObserverLobbyComponent: React.FC<ObserverLobbyProps> = ({ game }) => {
   const socket = useSocketContext();
   const { players, status } = game;
   const allPlayersReady = players.length === 2 && players.every((player) => player.readyToPlay);

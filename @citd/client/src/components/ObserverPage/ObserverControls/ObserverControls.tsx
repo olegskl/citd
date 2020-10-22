@@ -1,11 +1,15 @@
+import { Game } from '@citd/shared';
 import * as React from 'react';
 
-import { GameContextType } from '../../../context/game';
 import { useSocketContext } from '../../../context/socket';
 
 import './ObserverControls.css';
 
-const ObserverControlsComponent: React.FC<GameContextType> = ({ game }) => {
+type ObserverControlsProps = {
+  game: Game;
+}
+
+const ObserverControlsComponent: React.FC<ObserverControlsProps> = ({ game }) => {
   const socket = useSocketContext();
   const [areControlsDisplayed, setControlsDisplayed] = React.useState<boolean>(false);
 

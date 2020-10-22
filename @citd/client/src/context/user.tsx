@@ -6,10 +6,6 @@ import { LoginPage } from '../components/LoginPage';
 
 const UserContext = React.createContext<User | undefined>(undefined);
 
-export type UserContextType = {
-  user: User;
-};
-
 export const UserProvider: React.FC = ({ children }) => {
   const socket = useSocketContext();
   const [loading, setLoading] = React.useState<boolean>(true);
@@ -60,15 +56,3 @@ export const useUserContext = (): User => {
   }
   return context;
 };
-
-export function withUser<T extends UserContextType>(
-  Component: React.ComponentType<T>,
-): React.FC<Pick<T, Exclude<keyof T, 'user'>>> {
-  return function WrappedComponent(props) {
-    return (
-      <UserContext.Consumer>
-        {(user) => <Component {...(props as any)} user={user} />}
-      </UserContext.Consumer>
-    );
-  };
-}
