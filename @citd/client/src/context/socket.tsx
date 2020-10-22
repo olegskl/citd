@@ -8,7 +8,7 @@ interface IApi {
 
 const SocketContext = React.createContext<IApi | undefined>(undefined);
 
-export type SocketContextType = {
+type SocketContextType = {
   socket: IApi;
 };
 
@@ -113,15 +113,3 @@ export const useSocketContext = (): IApi => {
   }
   return context;
 };
-
-export function withSocket<T extends SocketContextType>(
-  Component: React.ComponentType<T>,
-): React.FC<Pick<T, Exclude<keyof T, 'socket'>>> {
-  return function WrappedComponent(props) {
-    return (
-      <SocketContext.Consumer>
-        {(socket) => <Component {...(props as any)} socket={socket} />}
-      </SocketContext.Consumer>
-    );
-  };
-}

@@ -5,10 +5,6 @@ import { useSocketContext } from './socket';
 
 const GameContext = React.createContext<Game | undefined>(undefined);
 
-export type GameContextType = {
-  game: Game;
-};
-
 export const GameProvider: React.FC = ({ children }) => {
   const socket = useSocketContext();
   const [loading, setLoading] = React.useState<boolean>(true);
@@ -44,15 +40,3 @@ export const useGameContext = (): Game => {
   }
   return context;
 };
-
-export function withGame<T extends GameContextType>(
-  Component: React.ComponentType<T>,
-): React.FC<Pick<T, Exclude<keyof T, 'game'>>> {
-  return function WrappedComponent(props) {
-    return (
-      <GameContext.Consumer>
-        {(game) => <Component {...(props as T)} game={game} />}
-      </GameContext.Consumer>
-    );
-  };
-}
