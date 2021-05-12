@@ -11,7 +11,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "codemirror": "^5.45.0"
+    "codemirror": "^5.58.2"
   },
   "devDependencies": {
     "typescript": "^4.0.2"

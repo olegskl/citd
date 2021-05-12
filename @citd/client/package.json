@@ -14,7 +14,7 @@
     "@citd/shared": "^1.0.0",
     "@emmetio/codemirror-plugin": "^0.5.4",
     "avataaars": "^1.2.1",
-    "codemirror": "^5.44.0",
+    "codemirror": "^5.58.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0"
