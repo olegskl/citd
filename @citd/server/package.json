@@ -13,7 +13,7 @@
     "@citd/shared": "^1.0.0",
     "bufferutil": "^4.0.1",
     "utf-8-validate": "^5.0.2",
-    "ws": "^7.1.2"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "@types/socket.io": "^2.1.2",
