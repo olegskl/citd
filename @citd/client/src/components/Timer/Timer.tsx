@@ -2,12 +2,26 @@ import * as React from 'react';
 
 import { useGameContext } from '../../context/game';
 import { useSocketContext } from '../../context/socket';
+import { useChannel } from '../../hooks/useChannel';
 
 import './Timer.css';
 
 type Time = {
   minutes: number;
   seconds: number;
+};
+
+const TimerC = () => {
+  const timeRemaining = useChannel('timeRemaining');
+
+  const minutes = Math.floor(timeRemaining / 60);
+  const seconds = timeRemaining - minutes * 60;
+
+  return (
+    <div className="game-timer">
+      {minutes}:{seconds}
+    </div>
+  );
 };
 
 const TimerComponent: React.FC = () => {

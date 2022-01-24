@@ -8,8 +8,8 @@ import { UserProvider } from '../../context/user';
 import { ObserverPage } from '../ObserverPage';
 import { PlayerPage } from '../PlayerPage';
 
-export const App: React.FC = () => (
-  <SocketProvider>
+export const App = (): React.ReactElement => (
+  <SocketProvider address="ws://127.0.0.1:3000/sock">
     <GameProvider>
       <BrowserRouter>
         <Switch>

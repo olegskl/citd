@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { useGameContext } from '../../context/game';
-import { useSocketContext } from '../../context/socket';
+import { useSocket } from '../../context/socket';
 
 import { ObserverControls } from './ObserverControls';
 import { ObserverLobby } from './ObserverLobby';
