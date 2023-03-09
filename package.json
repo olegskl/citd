@@ -11,7 +11,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "wsrun": "^5.0.2"
+    "wsrun": "^5.2.4"
   },
   "devDependencies": {},
   "workspaces": [

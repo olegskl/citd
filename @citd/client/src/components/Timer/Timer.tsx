@@ -1,41 +1,16 @@
 import * as React from 'react';
 
 import { useGameContext } from '../../context/game';
-import { useSocketContext } from '../../context/socket';
 
 import './Timer.css';
 
-type Time = {
-  minutes: number;
-  seconds: number;
-};
+const TimerComponent: React.VFC = () => {
+  const { game } = useGameContext();
 
-const TimerComponent: React.FC = () => {
-  const socket = useSocketContext();
-  const game = useGameContext();
-
-  const [{ seconds, minutes }, setTime] = React.useState<Time>({
-    seconds: 0,
-    minutes: 0,
-  });
-
-  React.useEffect(() => {
-    const setActualTime = (secondsRemaining: number) => {
-      const minutes = Math.floor(secondsRemaining / 60);
-      const seconds = secondsRemaining - minutes * 60;
-      setTime({ minutes, seconds });
-    };
-
-    setActualTime(game.timeRemaining);
-    socket.on('timeRemaining', setActualTime);
-
-    return () => {
-      socket.off('timeRemaining', setActualTime);
-    };
-  }, [socket, game]);
-
-  const minutesText = minutes < 10 ? `0${minutes}` : minutes;
-  const secondsText = seconds < 10 ? `0${seconds}` : seconds;
+  const minutes = Math.floor(game.timeRemaining / 60);
+  const seconds = game.timeRemaining - minutes * 60;
+  const minutesText = minutes.toString().padStart(2, '0');
+  const secondsText = seconds.toString().padStart(2, '0');
 
   return (
     <div className="game-timer">

@@ -1,58 +1,67 @@
-import { Game } from '@citd/shared';
+import { Action, DistributiveOmit, Game, INITIAL_GAME, Player, reducer } from '@citd/shared';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 
-import { useSocketContext } from './socket';
+import { useSocket } from './socket';
 
-const GameContext = React.createContext<Game | undefined>(undefined);
+const GameContext = React.createContext<GameContextType | undefined>(undefined);
 
 export type GameContextType = {
   game: Game;
+  dispatch: React.Dispatch<DistributiveOmit<Action, 'userId'>>;
+  playerId: string;
+  player?: Player;
 };
+
+const playerId =
+  window.sessionStorage.getItem('citd-user-id') ||
+  Date.now().toString(36) + Math.random().toString(36).slice(2);
+window.sessionStorage.setItem('citd-user-id', playerId);
 
 export const GameProvider: React.FC = ({ children }) => {
-  const socket = useSocketContext();
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [game, setGame] = React.useState<Game>();
+  const [game, dispatch] = React.useReducer(reducer, INITIAL_GAME);
+  const messageHandler = React.useCallback(
+    (actions) => {
+      if (Array.isArray(actions)) {
+        ReactDOM.unstable_batchedUpdates(() => {
+          actions.forEach((action) => {
+            dispatch(action);
+          });
+        });
+      } else {
+        dispatch(actions);
+      }
+    },
+    [dispatch],
+  );
 
-  const onGame = (game: Game) => {
-    setGame(game);
-    setLoading(false);
-  };
+  const socket = useSocket<Action | Action[]>('/ws', messageHandler);
+  const contextDispatch = React.useCallback(
+    (action: DistributiveOmit<Action, 'userId'>) =>
+      socket?.send(JSON.stringify({ ...action, userId: playerId })),
+    [socket],
+  );
+  const context = React.useMemo(
+    () => ({
+      game,
+      dispatch: contextDispatch,
+      playerId,
+      player: game.players.find((player) => player.id === playerId),
+    }),
+    [game, contextDispatch],
+  );
 
-  React.useEffect(() => {
-    socket.on('game', onGame);
-    socket.emit('getGame');
-
-    return () => {
-      socket.off('game', onGame);
-    };
-  }, [socket]);
-
-  // Loading state:
-  if (loading || !game) {
-    return <>Fetching game...</>;
-  }
+  if (!socket) return <>Connecting...</>;
+  if (!context) return <>Loading game...</>;
 
   // User is available:
-  return <GameContext.Provider value={game}>{children}</GameContext.Provider>;
+  return <GameContext.Provider value={context}>{children}</GameContext.Provider>;
 };
 
-export const useGameContext = (): Game => {
+export const useGameContext = (): GameContextType => {
   const context = React.useContext(GameContext);
   if (context === undefined) {
     throw new Error('useGameContext must be used within a GameProvider');
   }
   return context;
 };
-
-export function withGame<T extends GameContextType>(
-  Component: React.ComponentType<T>,
-): React.FC<Pick<T, Exclude<keyof T, 'game'>>> {
-  return function WrappedComponent(props) {
-    return (
-      <GameContext.Consumer>
-        {(game) => <Component {...(props as T)} game={game} />}
-      </GameContext.Consumer>
-    );
-  };
-}

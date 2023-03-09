@@ -10,7 +10,7 @@ type LobbyPlayerProps = {
   onPlayerKick: (playerId: string) => void;
 };
 
-const LobbyPlayerComponent: React.FC<LobbyPlayerProps> = ({
+const LobbyPlayerComponent: React.VFC<LobbyPlayerProps> = ({
   player,
   namePlaceholder,
   onPlayerKick,

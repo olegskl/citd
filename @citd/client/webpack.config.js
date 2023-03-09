@@ -1,5 +1,5 @@
 const path = require('path');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
@@ -9,24 +9,24 @@ module.exports = {
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './src/index.html',
-      title: 'SFEIR Code in the Dark'
-    })
+      title: 'CITD',
+    }),
   ],
   output: {
     filename: '[name].bundle.js',
     publicPath: '/',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
         use: 'ts-loader',
-        exclude: /node_modules/
+        exclude: /node_modules/,
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.png$/,
@@ -35,19 +35,18 @@ module.exports = {
           options: {
             name: '[name].[ext]',
             outputPath: 'images',
-            context: 'src'
-          }
-        }
-      }
-    ]
+            context: 'src',
+          },
+        },
+      },
+    ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.tsx', '.ts', '.js'],
   },
   devServer: {
-    host: '127.0.0.1',
     historyApiFallback: {
-      disableDotRule: true
-    }
-  }
+      disableDotRule: true,
+    },
+  },
 };

@@ -1,0 +1,52 @@
+.welcome-page {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.welcome-buttons {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.fancy-animated-svg {
+  z-index: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+}
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.fancy-animated-svg--out-top {
+  fill: var(--color-red-transparent);
+  animation: rotate 20s linear infinite;
+  transform-origin: 13px 25px;
+}
+.fancy-animated-svg--in-top {
+  fill: var(--color-yellow-transparent);
+  animation: rotate 10s linear infinite;
+  transform-origin: 13px 25px;
+}
+.fancy-animated-svg--out-bottom {
+  fill: var(--color-yellow-transparent);
+  animation: rotate 25s linear infinite;
+  transform-origin: 84px 93px;
+}
+.fancy-animated-svg--in-bottom {
+  fill: var(--color-blue);
+  animation: rotate 15s linear infinite;
+  transform-origin: 84px 93px;
+}

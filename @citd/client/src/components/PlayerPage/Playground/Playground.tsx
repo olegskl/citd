@@ -1,4 +1,4 @@
-import { isChange, isSelections, Operation } from '@citd/shared';
+import { GameStatus, isChange, isSelections, Operation } from '@citd/shared';
 import * as CodeMirror from 'codemirror';
 import applyEmmetPlugin from '@emmetio/codemirror-plugin';
 import * as React from 'react';
@@ -10,19 +10,16 @@ import 'codemirror/keymap/sublime.js';
 import 'codemirror/mode/htmlmixed/htmlmixed.js';
 
 import { Timer } from '../../Timer';
-import { PlayerPaused } from '../PlayerPaused';
+import { GamePausedOverlay } from '../GamePausedOverlay';
 
 import { useGameContext } from '../../../context/game';
-import { useSocketContext } from '../../../context/socket';
-import { useUserContext } from '../../../context/user';
 import { task, color } from '../../../task';
 
 import './Playground.css';
 
-const PlaygroundComponent: React.FC = () => {
-  const socket = useSocketContext();
-  const game = useGameContext();
-  const user = useUserContext();
+const PlaygroundComponent: React.VFC = () => {
+  const { game, playerId, dispatch } = useGameContext();
+  const isGamePaused = game.status === GameStatus.PAUSED;
 
   const [codeEditor, setCodeEditor] = React.useState<CodeMirror.Editor>();
   const initCodeEditor = React.useCallback((element: HTMLDivElement | null) => {
@@ -46,68 +43,52 @@ const PlaygroundComponent: React.FC = () => {
   }, []);
 
   React.useEffect(() => {
-    if (!codeEditor) {
-      return;
-    }
+    if (!codeEditor) return;
 
-    const emitChange = (
-      _instance: CodeMirror.Editor,
-      change: CodeMirror.EditorChangeLinkedList,
-    ) => {
-      socket.emit('operation', user.id, change);
+    const emitChange = (_: CodeMirror.Editor, change: CodeMirror.EditorChangeLinkedList) => {
+      dispatch({ type: 'operation', payload: change });
     };
 
     const emitSelections = (instance: CodeMirror.Editor) => {
       const selections = instance.getDoc().listSelections();
-      socket.emit('operation', user.id, selections);
+      dispatch({ type: 'operation', payload: selections });
     };
 
-    const onPlayerTimeline = (playerId: string, operations: Operation[]) => {
-      if (playerId !== user.id) {
-        return;
-      }
-      socket.off('playerTimeline', onPlayerTimeline);
+    const operations: Operation[] = game.operations
+      .filter(({ userId }) => !userId || userId === playerId)
+      .map(({ operation }) => operation);
 
-      if (operations.length === 0 || !codeEditor) {
-        return;
-      }
-
-      const doc = codeEditor.getDoc();
-      codeEditor.operation(() => {
-        // Apply only Changes first:
-        operations.forEach((operation) => {
-          if (isChange(operation)) {
-            const { text, from, to, origin } = operation;
-            doc.replaceRange(text.join('\n'), from, to, origin);
-          }
-        });
-        // Apply selection if it's the last one:
-        const lastOperation = operations[operations.length - 1];
-        if (isSelections(lastOperation)) {
-          doc.setSelections(lastOperation);
+    const doc = codeEditor.getDoc();
+    codeEditor.operation(() => {
+      // Apply only Changes first:
+      operations.forEach((operation) => {
+        if (isChange(operation)) {
+          const { text, from, to, origin } = operation;
+          doc.replaceRange(text.join('\n'), from, to, origin);
         }
       });
-      codeEditor.focus();
+      // Apply selection if it's the last one:
+      const lastOperation = operations[operations.length - 1];
+      if (isSelections(lastOperation)) {
+        doc.setSelections(lastOperation);
+      }
+    });
+    codeEditor.focus();
 
-      codeEditor.on('change', emitChange);
-      codeEditor.on('cursorActivity', emitSelections);
-    };
-
-    socket.on('playerTimeline', onPlayerTimeline);
-    socket.emit('getPlayerTimeline', user.id);
+    codeEditor.on('change', emitChange);
+    codeEditor.on('cursorActivity', emitSelections);
 
     return () => {
       codeEditor.off('change', emitChange);
       codeEditor.off('cursorActivity', emitSelections);
     };
-  }, [codeEditor, socket, user.id]);
+  }, [codeEditor, playerId]);
 
   React.useEffect(() => {
-    if (!codeEditor) {
-      return;
+    if (codeEditor) {
+      codeEditor.setOption('readOnly', isGamePaused);
     }
-    codeEditor.setOption('readOnly', game.status !== 'playing');
-  }, [codeEditor, game.status]);
+  }, [codeEditor, isGamePaused]);
 
   return (
     <div className="playground-wrapper">
@@ -121,7 +102,7 @@ const PlaygroundComponent: React.FC = () => {
           />
           <Timer />
         </div>
-        {game.status === 'paused' && <PlayerPaused />}
+        {isGamePaused && <GamePausedOverlay />}
       </div>
     </div>
   );

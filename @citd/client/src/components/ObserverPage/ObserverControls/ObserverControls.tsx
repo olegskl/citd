@@ -1,12 +1,11 @@
+import { GameStatus } from '@citd/shared';
 import * as React from 'react';
-
-import { GameContextType } from '../../../context/game';
-import { useSocketContext } from '../../../context/socket';
+import { useGameContext } from '../../../context/game';
 
 import './ObserverControls.css';
 
-const ObserverControlsComponent: React.FC<GameContextType> = ({ game }) => {
-  const socket = useSocketContext();
+const ObserverControlsComponent: React.VFC = () => {
+  const { game, dispatch } = useGameContext();
   const [areControlsDisplayed, setControlsDisplayed] = React.useState<boolean>(false);
 
   React.useEffect(() => {
@@ -24,29 +23,28 @@ const ObserverControlsComponent: React.FC<GameContextType> = ({ game }) => {
   }, [areControlsDisplayed]);
 
   const pauseGame = () => {
-    socket.emit('pauseGame');
+    dispatch({ type: 'pause' });
   };
 
   const startGame = () => {
-    socket.emit('startGame');
+    dispatch({ type: 'start' });
   };
 
   const resetGame = () => {
-    socket.emit('resetGame');
+    dispatch({ type: 'reset' });
   };
 
   const renderTitle = () => {
-    if (game.status === 'playing') {
-      return <div className="text-glitchy-medium">Time is running out!</div>;
+    switch (game.status) {
+      case GameStatus.PLAYING:
+        return <div className="text-glitchy-medium">Time is running out!</div>;
+      case GameStatus.PAUSED:
+        return <div className="text-glitchy-medium">Game is paused...</div>;
+      case GameStatus.ENDED:
+        return <div className="text-glitchy-medium">Game has ended</div>;
+      case GameStatus.WAITING:
+        return null;
     }
-    if (game.status === 'paused') {
-      return <div className="text-glitchy-medium">Game is paused...</div>;
-    }
-    if (game.status === 'ended') {
-      return <div className="text-glitchy-medium">Game has ended</div>;
-    }
-
-    return null;
   };
 
   if (!areControlsDisplayed) {
@@ -57,12 +55,12 @@ const ObserverControlsComponent: React.FC<GameContextType> = ({ game }) => {
     <div className="observer-controls">
       <h1 className="text-glitchy-large">Code in the Dark</h1>
       {renderTitle()}
-      {game.status === 'playing' && (
+      {game.status === GameStatus.PLAYING && (
         <button className="button-glitchy-yellow" onClick={pauseGame}>
           Pause the game
         </button>
       )}
-      {game.status === 'paused' && (
+      {game.status === GameStatus.PAUSED && (
         <button className="button-glitchy-yellow" onClick={startGame}>
           Unpause the game
         </button>

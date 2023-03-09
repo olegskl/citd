@@ -3,3 +3,9 @@
   flex-direction: column;
   align-items: center;
 }
+
+.game-over > .html-viewer {
+  margin-top: 3rem;
+  width: 50vh;
+  height: 50vh;
+}
