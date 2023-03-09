@@ -5,7 +5,7 @@ import { task, color } from '../../../task';
 
 import './Preview.css';
 
-export const Preview: React.FC = () => (
+export const Preview: React.VFC = () => (
   <div className="preview">
     <div
       className="html-viewer box-glitchy-white"

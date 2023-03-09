@@ -8,19 +8,23 @@ html, body, main {
   --color-red: rgb(119, 33, 18);
   --color-red-transparent: rgba(119, 33, 18, 0.5);
   --color-blue: rgb(10, 53, 75);
+  --color-blue-transparent: rgb(10, 53, 75, 0.5);
   --color-yellow: rgb(199, 164, 41);
   --color-yellow-transparent: rgba(199, 164, 41, 0.8);
   --color-background: rgb(25, 28, 27);
 
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
-  overflow: hidden;
   font-size: 20px;
   font-family: Helvetica, Arial, sans-serif;
   color: var(--color-white);
   background-color: var(--color-background);
+}
+
+::selection {
+  color: var(--color-red);
 }
 
 .box-glitchy-red {
@@ -53,11 +57,25 @@ html, body, main {
   cursor: pointer;
   outline-width: 0;
   color: var(--color-white);
+  text-decoration: none;
   background-color: var(--color-yellow);
   box-shadow:
     var(--color-white-transparent) 0.2rem 0.2rem 0,
     var(--color-blue) -0.2rem 0.4rem 0,
     var(--color-red) 0.4rem -0.2rem 0;
+}
+
+.text-glitchy-huge {
+  text-align: center;
+  text-transform: uppercase;
+  font-family: 'Raleway', sans-serif;
+  font-size: 6rem;
+  font-weight: 900;
+  color: var(--color-yellow);
+  text-shadow:
+    var(--color-white-transparent) 0.3rem 0.3rem 0,
+    var(--color-red) 0.6rem 0 0,
+    var(--color-blue) 0 0.6rem 0;
 }
 
 .text-glitchy-large {
@@ -84,6 +102,14 @@ html, body, main {
     var(--color-white-transparent) 0.05rem 0.05rem 0,
     var(--color-blue) 0 0.15rem 0,
     var(--color-red) 0.15rem 0 0;
+}
+
+.text-readable {
+  text-align: center;
+  font-family: 'Raleway', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-yellow);
 }
 
 @keyframes blink {

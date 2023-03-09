@@ -1,39 +1,47 @@
 import * as React from 'react';
 
 import { useGameContext } from '../../context/game';
-import { useSocketContext } from '../../context/socket';
 
 import { ObserverControls } from './ObserverControls';
 import { ObserverLobby } from './ObserverLobby';
 import { Preview } from './Preview';
+import { GameStatus } from '@citd/shared';
 import { Viewer } from './Viewer';
 
 import './ObserverPage.css';
 
-const ObserverPageComponent: React.FC = () => {
-  const socket = useSocketContext();
-  const game = useGameContext();
+type ObserverPageComponentProps = {
+  host?: boolean;
+};
 
-  React.useEffect(() => {
-    socket.emit('joinChannel', 'observers');
+const ObserverPageComponent: React.VFC<ObserverPageComponentProps> = ({ host }) => {
+  const { game } = useGameContext();
 
-    return () => {
-      socket.emit('leaveChannel', 'observers');
-    };
-  }, [socket]);
-
-  if (game.status === 'playing' || game.status === 'paused' || game.status === 'ended') {
-    return (
-      <div className="viewer-list">
-        <Viewer player={game.players[0]} />
-        <Preview />
-        <Viewer player={game.players[1]} />
-        <ObserverControls game={game} />
-      </div>
-    );
+  switch (game.status) {
+    case GameStatus.PLAYING:
+    case GameStatus.PAUSED:
+    case GameStatus.ENDED:
+      return (
+        <div className="viewer-list">
+          <Viewer
+            player={game.players[0]}
+            operations={game.operations
+              .filter(({ userId }) => !userId || userId === game.players[0].id)
+              .map(({ operation }) => operation)}
+          />
+          <Preview />
+          <Viewer
+            player={game.players[1]}
+            operations={game.operations
+              .filter(({ userId }) => !userId || userId === game.players[1].id)
+              .map(({ operation }) => operation)}
+          />
+          {host && <ObserverControls />}
+        </div>
+      );
+    case GameStatus.WAITING:
+      return <ObserverLobby host={host} />;
   }
-
-  return <ObserverLobby game={game} />;
 };
 
 export const ObserverPage = React.memo(ObserverPageComponent);

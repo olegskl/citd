@@ -3,6 +3,7 @@
     "outDir": "./dist/",
     "strict": true,
     "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
     "target": "es6",
     "jsx": "react",
     "allowJs": true,

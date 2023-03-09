@@ -1,39 +1,25 @@
+import { GameStatus } from '@citd/shared';
 import * as React from 'react';
 
 import { useGameContext } from '../../context/game';
-import { useSocketContext } from '../../context/socket';
-import { useUserContext } from '../../context/user';
 
 import { GameOver } from './GameOver';
-import { PlayerLobby } from './PlayerLobby';
+import { GameLobby } from './GameLobby';
 import { Playground } from './Playground';
 
-const PlayerPageComponent: React.FC = () => {
-  const socket = useSocketContext();
-  const game = useGameContext();
-  const user = useUserContext();
+// Game Lobby
+const PlayerPageComponent: React.VFC = () => {
+  const { game } = useGameContext();
 
-  React.useEffect(() => {
-    socket.emit('joinChannel', 'players');
-    socket.emit('joinGame', user.id);
-
-    return () => {
-      socket.emit('leaveChannel', 'players');
-    };
-  }, [socket, user.id]);
-
-  // Waiting state:
-  const isPlayerInGame = game.players.some((player) => player.id === user.id);
-
-  if (game.status === 'waiting' || !isPlayerInGame) {
-    return <PlayerLobby />;
+  switch (game.status) {
+    case GameStatus.WAITING:
+      return <GameLobby />;
+    case GameStatus.PLAYING:
+    case GameStatus.PAUSED:
+      return <Playground />;
+    case GameStatus.ENDED:
+      return <GameOver />;
   }
-  // Ended state:
-  if (game.status === 'ended') {
-    return <GameOver />;
-  }
-  // Playing (and paused as overlay) state:
-  return <Playground />;
 };
 
 export const PlayerPage = React.memo(PlayerPageComponent);
