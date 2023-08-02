@@ -6,7 +6,7 @@
   "scripts": {
     "start": "wsrun start",
     "build": "wsrun build",
-    "test": "yarn lint",
+    "test": "wsrun type-check",
     "lint": "wsrun --exclude-missing lint"
   },
   "license": "MIT",

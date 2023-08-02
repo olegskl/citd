@@ -18,10 +18,10 @@ const playerId =
   Date.now().toString(36) + Math.random().toString(36).slice(2);
 window.sessionStorage.setItem('citd-user-id', playerId);
 
-export const GameProvider: React.FC = ({ children }) => {
+export const GameProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [game, dispatch] = React.useReducer(reducer, INITIAL_GAME);
   const messageHandler = React.useCallback(
-    (actions) => {
+    (actions: Action | Action[]) => {
       if (Array.isArray(actions)) {
         ReactDOM.unstable_batchedUpdates(() => {
           actions.forEach((action) => {

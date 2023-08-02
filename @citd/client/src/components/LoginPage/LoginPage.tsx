@@ -4,7 +4,7 @@ import { useGameContext } from '../../context/game';
 
 import './LoginPage.css';
 
-const LoginPageComponent: React.FC = ({ children }) => {
+const LoginPageComponent: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { player, dispatch } = useGameContext();
   const [name, setName] = React.useState<string>('');
 

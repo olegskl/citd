@@ -1,8 +1,10 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import { App } from './components/App';
 
 import './index.css';
 
-ReactDOM.render(<App />, document.querySelector('main'));
+const container = document.querySelector('main')!;
+const root = createRoot(container);
+root.render(<App />);
