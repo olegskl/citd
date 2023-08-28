@@ -5,36 +5,28 @@
   flex-direction: column;
   align-items: stretch;
   user-select: none;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .playground {
   flex: 1;
   display: flex;
   align-items: stretch;
+  gap: 1rem;
+  margin: 0 1rem 1rem 1rem;
 }
 
-.code-editor {
-  position: relative;
-  flex: 1;
-  margin: 0.5rem;
-}
-
-.code-editor > .CodeMirror {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+.editor-wrapper {
+  flex: 2;
 }
 
 .sidebar {
   position: relative;
-  flex: 0 0 calc(100vw / 3);
+  flex: 1;
 }
 
 .sidebar-preview {
-  margin: 0.5rem;
-  width: calc(100% - 1rem);
   aspect-ratio: 1;
   background-position: center;
   background-size: contain;

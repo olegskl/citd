@@ -1,0 +1,4 @@
+/* Hack for delimiter.bracket.css theme rule token */
+.monaco-editor .bracket-highlighting-0 {
+  color: #1986bc !important;
+}

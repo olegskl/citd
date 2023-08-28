@@ -9,9 +9,5 @@
     "allowJs": true,
     "skipLibCheck": true
   },
-  "files": [
-    "@types/images.d.ts",
-    "@types/codemirror-plugin.d.ts",
-    "src/index.tsx"
-  ]
+  "files": ["@types/images.d.ts", "src/index.tsx"]
 }
