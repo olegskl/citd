@@ -1,4 +1,4 @@
-import { EditorChangeLinkedList, Position } from "codemirror";
+import type * as monaco from "monaco-editor";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type DistributiveOmit<T, K extends keyof any> = T extends any
@@ -29,19 +29,22 @@ export type Game = {
   operations: { userId: string; operation: Operation }[];
 };
 
-export type Change = EditorChangeLinkedList;
-export type Selection = { anchor: Position; head: Position };
-export type Operation = Change | Selection[];
-
-export function isChange(operation: Operation): operation is Change {
-  return !Array.isArray(operation);
-}
-
-export function isSelections(operation: Operation): operation is Selection[] {
-  return Array.isArray(operation);
-}
+export type Operation = {
+  edits?: monaco.editor.IIdentifiedSingleEditOperation[];
+  selections?: monaco.ISelection[];
+};
 
 const MAX_PLAYERS = 2;
+const INITIAL_EDIT: monaco.editor.IIdentifiedSingleEditOperation = {
+  range: { startColumn: 0, startLineNumber: 0, endColumn: 0, endLineNumber: 0 },
+  text: `<!doctype html>\n<html>\n\n<body>\n  \n</body>\n\n</html>\n`,
+};
+const INITIAL_SELECTION: monaco.ISelection = {
+  selectionStartColumn: 3,
+  selectionStartLineNumber: 5,
+  positionColumn: 3,
+  positionLineNumber: 5,
+};
 
 export type Action =
   | { type: "tick" }
@@ -105,26 +108,9 @@ export function reducer(state: Game, action: Action): Game {
           {
             userId: action.userId,
             operation: {
-              from: { ch: 0, line: 0 },
-              to: { ch: 0, line: 0 },
-              text: [
-                "<!doctype html>",
-                "<html>",
-                "  <body>",
-                "    ",
-                "  </body>",
-                "</html>",
-              ],
+              edits: [INITIAL_EDIT],
+              selections: [INITIAL_SELECTION],
             },
-          },
-          {
-            userId: action.userId,
-            operation: [
-              {
-                anchor: { ch: 4, line: 3 },
-                head: { ch: 4, line: 3 },
-              },
-            ],
           },
         ],
       };

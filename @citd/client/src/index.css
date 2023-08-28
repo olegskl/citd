@@ -14,7 +14,8 @@ html, body, main {
   --color-background: rgb(25, 28, 27);
 
   width: 100vw;
-  min-height: 100vh;
+  height: 100vh;
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
   font-size: 20px;
