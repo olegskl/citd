@@ -27,6 +27,7 @@ export type Game = {
   timeRemaining: number;
   players: Player[];
   operations: { userId: string; operation: Operation }[];
+  taskId: string;
 };
 
 export type Operation = {
@@ -53,6 +54,7 @@ export type Action =
   | { type: "changeName"; userId: string; payload: string }
   | { type: "changeReadyToPlayStatus"; userId: string; payload: boolean }
   | { type: "kickPlayer"; userId: string; payload: string }
+  | { type: "setTask"; userId: string; payload: string }
   | { type: "start"; userId: string }
   | { type: "pause"; userId: string }
   | { type: "unpause"; userId: string }
@@ -142,6 +144,8 @@ export function reducer(state: Game, action: Action): Game {
           (operation) => operation.userId !== action.payload
         ),
       };
+    case "setTask":
+      return { ...state, taskId: action.payload };
     case "start":
       return { ...state, status: GameStatus.PLAYING };
     case "pause":
@@ -154,6 +158,7 @@ export function reducer(state: Game, action: Action): Game {
 export function createInitialGame(): Game {
   return {
     status: GameStatus.WAITING,
+    taskId: "defaultTask",
     timeRemaining: 15 * 60,
     players: [],
     operations: [],

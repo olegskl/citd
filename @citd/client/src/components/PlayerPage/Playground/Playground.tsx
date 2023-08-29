@@ -4,7 +4,7 @@ import { useCodeEditor } from '../../CodeEditor';
 import { Timer } from '../../Timer';
 import { GamePausedOverlay } from '../GamePausedOverlay';
 import { useGameContext } from '../../../context/game';
-import { task, color } from '../../../task';
+import { tasks } from '../../../task';
 
 import './Playground.css';
 
@@ -12,6 +12,7 @@ const PlaygroundComponent = () => {
   const { game, playerId, dispatch } = useGameContext();
   const isGamePaused = game.status === GameStatus.PAUSED;
   const { containerRef, editor } = useCodeEditor({ autoFocus: false, readOnly: true });
+  const task = tasks[game.taskId];
 
   React.useEffect(() => {
     if (!editor || !playerId) return;
@@ -67,7 +68,7 @@ const PlaygroundComponent = () => {
         <div className="sidebar">
           <div
             className="box-glitchy-white sidebar-preview"
-            style={{ backgroundColor: color, backgroundImage: `url(${task})` }}
+            style={{ backgroundColor: task.color, backgroundImage: `url(${task.url})` }}
           />
           <Timer />
         </div>

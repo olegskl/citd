@@ -6,6 +6,7 @@ import { LobbyPlayer } from '../LobbyPlayer';
 
 import './ObserverLobby.css';
 import { Link } from 'react-router-dom';
+import { tasks } from '../../../task';
 
 type ObserverLobbyComponent = {
   host?: boolean;
@@ -19,6 +20,11 @@ const ObserverLobbyComponent: React.VFC<ObserverLobbyComponent> = ({ host }) => 
   const onPlayerKick = (userId: string) => {
     if (!host) return;
     dispatch({ type: 'kickPlayer', payload: userId });
+  };
+
+  const setTask: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
+    if (!host) return;
+    dispatch({ type: 'setTask', payload: event.currentTarget.value });
   };
 
   const startGame = () => {
@@ -81,6 +87,15 @@ const ObserverLobbyComponent: React.VFC<ObserverLobbyComponent> = ({ host }) => 
     <div className="observer-lobby">
       <h1 className="text-glitchy-large">Code in the Dark</h1>
       {renderTitle()}
+      {host && (
+        <select name="taskId" value={game.taskId} onChange={setTask}>
+          {Object.entries(tasks).map(([taskId, task]) => (
+            <option key={taskId} value={taskId}>
+              {task.name}
+            </option>
+          ))}
+        </select>
+      )}
       <div className="observer-lobby-player-list">
         <LobbyPlayer player={players[0]} namePlaceholder="Player 1" onPlayerKick={onPlayerKick} />
         <LobbyPlayer player={players[1]} namePlaceholder="Player 2" onPlayerKick={onPlayerKick} />
