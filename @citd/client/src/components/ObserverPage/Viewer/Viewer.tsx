@@ -88,9 +88,9 @@ const ViewerComponent: React.FC<ViewerProps> = ({ player, operations }) => {
       {/* Result viewer */}
       <div className="html-viewer box-glitchy-white">
         <ResultViewer content={iFrameContent} />
+        <div className="player-name">{player.name}</div>
       </div>
       {/* Code viewer */}
-      <div className="player-name">{player.name}</div>
       <div ref={containerRef} className="code-viewer box-glitchy-white" />
     </div>
   );

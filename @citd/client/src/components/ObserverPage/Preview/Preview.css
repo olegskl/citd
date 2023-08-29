@@ -5,7 +5,7 @@
 }
 
 .preview > .html-viewer {
-  flex: 0 0 calc(50vh - 1rem);
+  aspect-ratio: 1;
   margin: 0.5rem 0;
   background-position: center;
   background-size: contain;
@@ -13,6 +13,6 @@
 }
 
 .preview > .scores {
-  flex: 0 0 calc(50vh - 1rem);
+  flex: 1;
   margin: 0.5rem 0;
 }
