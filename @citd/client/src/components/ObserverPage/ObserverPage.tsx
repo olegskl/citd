@@ -29,7 +29,7 @@ const ObserverPageComponent: React.VFC<ObserverPageComponentProps> = ({ host }) 
               .filter(({ userId }) => !userId || userId === game.players[0].id)
               .map(({ operation }) => operation)}
           />
-          <Preview />
+          <Preview taskId={game.taskId} />
           <Viewer
             player={game.players[1]}
             operations={game.operations
