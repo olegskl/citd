@@ -75,7 +75,7 @@ export function reducer(state: Game, action: Action): Game {
       };
     }
     case "reset": {
-      return { ...INITIAL_GAME };
+      return createInitialGame();
     }
     case "operation": {
       return {
@@ -138,6 +138,9 @@ export function reducer(state: Game, action: Action): Game {
       return {
         ...state,
         players: state.players.filter((player) => player.id !== action.payload),
+        operations: state.operations.filter(
+          (operation) => operation.userId !== action.payload
+        ),
       };
     case "start":
       return { ...state, status: GameStatus.PLAYING };
@@ -148,9 +151,11 @@ export function reducer(state: Game, action: Action): Game {
   }
 }
 
-export const INITIAL_GAME: Readonly<Game> = {
-  status: GameStatus.WAITING,
-  timeRemaining: 15 * 60,
-  players: [],
-  operations: [],
-};
+export function createInitialGame(): Game {
+  return {
+    status: GameStatus.WAITING,
+    timeRemaining: 15 * 60,
+    players: [],
+    operations: [],
+  };
+}

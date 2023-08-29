@@ -5,6 +5,7 @@ import { useGameContext } from '../../../context/game';
 import { LobbyPlayer } from '../LobbyPlayer';
 
 import './ObserverLobby.css';
+import { Link } from 'react-router-dom';
 
 type ObserverLobbyComponent = {
   host?: boolean;
@@ -84,7 +85,13 @@ const ObserverLobbyComponent: React.VFC<ObserverLobbyComponent> = ({ host }) => 
         <LobbyPlayer player={players[0]} namePlaceholder="Player 1" onPlayerKick={onPlayerKick} />
         <LobbyPlayer player={players[1]} namePlaceholder="Player 2" onPlayerKick={onPlayerKick} />
       </div>
-      {host && renderCallToAction()}
+      {host ? (
+        renderCallToAction()
+      ) : (
+        <Link to="/" className="button-glitchy-yellow">
+          Leave
+        </Link>
+      )}
     </div>
   );
 };

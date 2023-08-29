@@ -9,14 +9,11 @@ export const WelcomePage: React.VFC = () => (
     <div className="welcome-page">
       <h1 className="text-glitchy-huge">Code in the Dark</h1>
       <div className="welcome-buttons">
-        <Link to="/rules" className="button-glitchy-yellow">
-          Rules
-        </Link>
         <Link to="/watch" className="button-glitchy-yellow">
           Watch
         </Link>
         <Link to="/play" className="button-glitchy-yellow">
-          Play
+          Play in the dark
         </Link>
       </div>
     </div>

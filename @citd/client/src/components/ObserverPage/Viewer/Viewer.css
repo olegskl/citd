@@ -4,10 +4,13 @@
   flex-direction: column;
 }
 
-.viewer > .html-viewer,
-.viewer > .code-viewer {
-  flex: 0 0 calc(50vh - 1rem);
+.viewer > .html-viewer {
   margin: 0.5rem 0;
+  aspect-ratio: 1;
+}
+.viewer > .code-viewer {
+  margin: 0.5rem 0;
+  flex: 1;
 }
 
 .code-viewer {
@@ -24,7 +27,7 @@
 
 .player-name {
   position: absolute;
-  top: 50%;
+  top: 100%;
   right: 0;
   background: #c7a32a;
   padding: 0.5rem 1rem;

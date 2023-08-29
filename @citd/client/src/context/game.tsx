@@ -1,4 +1,4 @@
-import { Action, DistributiveOmit, Game, INITIAL_GAME, Player, reducer } from '@citd/shared';
+import { Action, DistributiveOmit, Game, Player, createInitialGame, reducer } from '@citd/shared';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
@@ -19,7 +19,7 @@ const playerId =
 window.sessionStorage.setItem('citd-user-id', playerId);
 
 export const GameProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const [game, dispatch] = React.useReducer(reducer, INITIAL_GAME);
+  const [game, dispatch] = React.useReducer(reducer, createInitialGame());
   const messageHandler = React.useCallback(
     (actions: Action | Action[]) => {
       if (Array.isArray(actions)) {
@@ -35,7 +35,7 @@ export const GameProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
     [dispatch],
   );
 
-  const socket = useSocket<Action | Action[]>('/ws', messageHandler);
+  const socket = useSocket<Action | Action[]>('/ws/game', messageHandler);
   const contextDispatch = React.useCallback(
     (action: DistributiveOmit<Action, 'userId'>) =>
       socket?.send(JSON.stringify({ ...action, userId: playerId })),

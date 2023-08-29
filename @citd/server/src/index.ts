@@ -1,46 +1,19 @@
-import { Action, Game, GameStatus, INITIAL_GAME, reducer } from "@citd/shared";
-import * as WebSocket from "ws";
+import { createServer } from "http";
+import { parse } from "url";
+import { gameServer } from "./gameServer";
 
-const wss = new WebSocket.WebSocketServer({ port: 3000, path: "/ws" });
+const server = createServer();
 
-const history: Action[] = [{ type: "reset" }];
-let game = INITIAL_GAME;
+server.on("upgrade", function upgrade(request, socket, head) {
+  const { pathname } = parse(request.url!);
 
-function onMessage(message: WebSocket.RawData, isBinary: boolean) {
-  const actions: Action | Action[] = JSON.parse(message.toString());
-  if (Array.isArray(actions)) {
-    actions.forEach((action) => {
-      history.push(action);
-      game = reducer(game, action);
+  if (pathname === "/ws/game") {
+    gameServer.handleUpgrade(request, socket, head, function done(ws) {
+      gameServer.emit("connection", ws, request);
     });
   } else {
-    history.push(actions);
-    game = reducer(game, actions);
+    socket.destroy();
   }
-  broadcast(wss, message, isBinary);
-}
-
-setInterval(() => {
-  if (game.status === GameStatus.PLAYING) {
-    wss.emit("message");
-    onMessage(Buffer.from(JSON.stringify({ type: "tick" })), false);
-  }
-}, 1000);
-
-wss.on("connection", (ws) => {
-  ws.on("error", console.error);
-  ws.on("message", onMessage);
-  ws.send(JSON.stringify(history));
 });
 
-function broadcast(
-  wss: WebSocket.WebSocketServer,
-  message: WebSocket.RawData,
-  binary: boolean
-): void {
-  wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(message, { binary });
-    }
-  });
-}
+server.listen(3000);
