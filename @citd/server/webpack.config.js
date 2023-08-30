@@ -17,10 +17,6 @@ module.exports = {
         use: "ts-loader",
         exclude: /node_modules/,
       },
-      {
-        test: /\.css$/,
-        use: ["file-loader", "css-loader"],
-      },
     ],
   },
   resolve: {
